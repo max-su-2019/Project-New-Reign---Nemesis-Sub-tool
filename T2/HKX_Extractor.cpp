@@ -162,10 +162,9 @@ namespace
 
 	PatchInput LoadInput(const fs::path& source, const fs::path& converted)
 	{
-		auto input = ReadInput(source);
-		if (input.type != InputType::unknown || !boost::iequals(source.extension().native(), L".hkx"))
+		if (!boost::iequals(source.extension().native(), L".hkx"))
 		{
-			return input;
+			return ReadInput(source);
 		}
 
 		const auto converter = FindConverter();

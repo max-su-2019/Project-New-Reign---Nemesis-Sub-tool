@@ -32,6 +32,6 @@ Use 4 to 6 ASCII letters or digits for the mod code. The DLL lowercases it befor
 
 Behavior patches are written directly into the requested directory. AnimData and AnimSetData keep their project subdirectories inside it. The DLL creates missing directories and replaces files whose names match generated patches. Other files in the directory are preserved. Calls in the same process can run consecutively or from multiple threads.
 
-The function returns `true` when comparison succeeds, including inputs with no changes, and `false` on failure. Pair inputs of the same type and use the same first-person or third-person variant for Behavior. To process binary `.hkx` input, provide `hkxcmd.exe` beside the DLL or in the host's working directory. Havok XML can be passed directly.
+The function returns `true` when comparison succeeds, including inputs with no changes, and `false` on failure. Pair inputs of the same type and use the same first-person or third-person variant for Behavior. The DLL runs `hkxcmd.exe` on each `.hkx` input before comparing it, including files that already contain Havok XML. Place the converter beside the DLL or in the host's working directory. Use the `.xml` extension for Havok XML you want the DLL to read directly.
 
 [Implementation review](IMPLEMENTATION_REVIEW.md)
