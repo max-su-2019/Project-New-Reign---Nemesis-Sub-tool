@@ -3,7 +3,7 @@
 
 #include "src\atomiclock.h"
 
-#include <QtCore\QProcess>
+#include <boost/process/system.hpp>
 
 using namespace std;
 
@@ -199,7 +199,8 @@ void GetFunctionLines(string filename, vecstr& storeline)
 	string curfilename;
 	bool hkx = false;
 
-	if (boost::filesystem::exists("hkxcmd.exe"))
+	const auto converter = boost::filesystem::absolute("hkxcmd.exe");
+	if (boost::filesystem::exists(converter))
 	{
 		usize counter = 0;
 		char charline[2000];
@@ -246,26 +247,21 @@ void GetFunctionLines(string filename, vecstr& storeline)
 				curfilename = filename;
 			}
 
-			string cmd = "hkxcmd convert -v:XML \"" + curfilename + "\" \"" + curfilename + ".hkx\"";
+			const string convertedFilename = curfilename + ".hkx";
 
 			try
 			{
-				if (QProcess::execute(QString::fromStdString(cmd)) != 0)
+				if (boost::process::system(converter, "convert", "-v:XML", curfilename, convertedFilename) != 0
+					|| !boost::filesystem::exists(convertedFilename))
 				{
-					cout << "ERROR: Unable to convert file. (Command: " << cmd << ")" << endl;
-					Error = true;
-					return;
-				}
-				else if (!boost::filesystem::exists(curfilename + ".hkx"))
-				{
-					cout << "ERROR: Unable to convert file. (Command: " << cmd << ")" << endl;
+					cout << "ERROR: Unable to convert file (File: " << curfilename << ")" << endl;
 					Error = true;
 					return;
 				}
 			}
-			catch (...)
+			catch (const exception& ex)
 			{
-				cout << "ERROR: Unable to convert file. (Command: " << cmd << ")" << endl;
+				cout << "ERROR: Unable to convert file (File: " << curfilename << "): " << ex.what() << endl;
 				Error = true;
 				return;
 			}
@@ -282,7 +278,7 @@ void GetFunctionLines(string filename, vecstr& storeline)
 				}
 			}
 
-			curfilename.append(".hkx");
+			curfilename = convertedFilename;
 			hkx = true;
 		}
 		else
