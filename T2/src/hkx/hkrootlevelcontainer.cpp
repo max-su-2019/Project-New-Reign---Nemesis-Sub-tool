@@ -119,8 +119,7 @@ void hkrootlevelcontainer::connect(string filepath, string preaddress, int funct
 	}
 	else
 	{
-		cout << "ERROR: Invalid reference. Root can only be refered once" << endl;
-		Error = true;
+		PatchError{} << "ERROR: Invalid reference. Root can only be refered once" << endl;
 	}
 }
 

@@ -27,8 +27,7 @@ bool blendingOldFunction(shared_ptr<hkbobject> hkb_obj, string address, int func
 
 			if (trans_itr == hkbstatemachinetransitioninfoarrayList_E.end())
 			{
-				cout << "ERROR: Invalid behavior format detected (ID 1: " <<  hkb_obj << ", ID 2: " << tempparent << ")" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Invalid behavior format detected (ID 1: " <<  hkb_obj << ", ID 2: " << tempparent << ")" << endl;
 				return false;
 			}
 

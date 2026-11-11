@@ -1,3 +1,4 @@
 LIBRARY HKX_Extractor
 EXPORTS
-    GenerateBehaviorPatchFiles
+    GenerateBehaviorPatchFiles @1
+    GetBehaviorPatchLastError @2

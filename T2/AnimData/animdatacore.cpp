@@ -69,8 +69,7 @@ void animDataProcess()
 	{
 		if (!createDirectories(folder + "\\$header$"))
 		{
-			cout << "ERROR: Failed to create directory for animationdata header file (Project: $header$, Header: $header$)" << endl;
-			Error = true;
+			PatchError{} << "ERROR: Failed to create directory for animationdata header file (Project: $header$, Header: $header$)" << endl;
 			return;
 		}
 
@@ -91,8 +90,7 @@ void animDataProcess()
 		}
 		else
 		{
-			cout << "ERROR: Failed to output animationdata header file (Project: $header$, Header: $header$)" << endl;
-			Error = true;
+			PatchError{} << "ERROR: Failed to output animationdata header file (Project: $header$, Header: $header$)" << endl;
 			return;
 		}
 	}
@@ -129,8 +127,7 @@ void ProxyProject(int counter, string folder)
 
 	if (!createDirectories(folder + projectname))
 	{
-		cout << "ERROR: Failed to create output directory for animationdata (Project: " + projectname + ", Path: " + folder + projectname + ")" << endl;
-		Error = true;
+		PatchError{} << "ERROR: Failed to create output directory for animationdata (Project: " + projectname + ", Path: " + folder + projectname + ")" << endl;
 		return;
 	}
 
@@ -154,8 +151,7 @@ void ProxyProject(int counter, string folder)
 	}
 	else
 	{
-		cout << "ERROR: Failed to output animationdata header file (Project: " << animData->name << ", Header: $header$)" << endl;
-		Error = true;
+		PatchError{} << "ERROR: Failed to output animationdata header file (Project: " << animData->name << ", Header: $header$)" << endl;
 		return;
 	}
 
@@ -190,8 +186,7 @@ void ProxyProject(int counter, string folder)
 			}
 			else
 			{
-				cout << "ERROR: Failed to output animationdata header file (Project: " << animData->name << ", Header: " << name << ")" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Failed to output animationdata header file (Project: " << animData->name << ", Header: " << name << ")" << endl;
 				return;
 			}
 		}
@@ -207,8 +202,7 @@ void ProxyProject(int counter, string folder)
 
 			if (!output.is_open())
 			{
-				cout << "ERROR: Failed to output animationdata header file (Project: " << animData->name << ", Unique Code: " << infodata.uniquecode << ")" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Failed to output animationdata header file (Project: " << animData->name << ", Unique Code: " << infodata.uniquecode << ")" << endl;
 				return;
 			}
 
@@ -246,8 +240,7 @@ void ProjectProcessing(int i, string folder)
 
 	if (!createDirectories(folder + projectname))
 	{
-		cout << "ERROR: Failed to create new folder (Folder: " << folder << projectname << ")" << endl;
-		Error = true;
+		PatchError{} << "ERROR: Failed to create new folder (Folder: " << folder << projectname << ")" << endl;
 		return;
 	}
 
@@ -317,8 +310,7 @@ void ProjectProcessing(int i, string folder)
 		}
 		else
 		{
-			cout << "ERROR: Failed to output animationdata header file (Project: " << AnimDataEdited[i]->name << ", Header: $header$)" << endl;
-			Error = true;
+			PatchError{} << "ERROR: Failed to output animationdata header file (Project: " << AnimDataEdited[i]->name << ", Header: $header$)" << endl;
 			return;
 		}
 	}
@@ -363,8 +355,7 @@ void ProjectProcessing(int i, string folder)
 				}
 				else
 				{
-					cout << "ERROR: Failed to output animationdata header file (Project: " << AnimDataEdited[i]->name << ", Header: " << name << ")" << endl;
-					Error = true;
+					PatchError{} << "ERROR: Failed to output animationdata header file (Project: " << AnimDataEdited[i]->name << ", Header: " << name << ")" << endl;
 					return;
 				}
 			}
@@ -410,8 +401,7 @@ void ProjectProcessing(int i, string folder)
 				}
 				else
 				{
-					cout << "ERROR: Failed to output animationdata header file (Project: " << AnimDataEdited[i]->name << ", Unique Code: " << infodata.uniquecode << ")" << endl;
-					Error = true;
+					PatchError{} << "ERROR: Failed to output animationdata header file (Project: " << AnimDataEdited[i]->name << ", Unique Code: " << infodata.uniquecode << ")" << endl;
 					return;
 				}
 			}
@@ -511,8 +501,7 @@ void ProjectProcessing(int i, string folder)
 			{
 				if (oriAnimData->name != editAnimData->name)
 				{
-					cout << "ERROR: AnimData name inconsistency detected. Please report to Nemesis' author" << endl;
-					Error = true;
+					PatchError{} << "ERROR: AnimData name inconsistency detected. Please report to Nemesis' author" << endl;
 					return;
 				}
 				else
@@ -613,8 +602,7 @@ void ProjectProcessing(int i, string folder)
 				}
 				else
 				{
-					cout << "ERROR: Failed to output infodata file (Project: " << AnimDataEdited[i]->name << ", Header: " << name << ")" << endl;
-					Error = true;
+					PatchError{} << "ERROR: Failed to output infodata file (Project: " << AnimDataEdited[i]->name << ", Header: " << name << ")" << endl;
 					return;
 				}
 			}
@@ -719,8 +707,7 @@ void ProjectProcessing(int i, string folder)
 			{
 				if (oriInfoData->uniquecode != editInfoData->uniquecode)
 				{
-					cout << "ERROR: AnimData name inconsistency detected. Please report to Nemesis' author" << endl;
-					Error = true;
+					PatchError{} << "ERROR: AnimData name inconsistency detected. Please report to Nemesis' author" << endl;
 					return;
 				}
 				else
@@ -784,8 +771,7 @@ void ProjectProcessing(int i, string folder)
 				}
 				else
 				{
-					cout << "ERROR: Failed to output infodata file (Project: " << AnimDataEdited[i]->name << ", Unique Code: " << uniquecode << ")" << endl;
-					Error = true;
+					PatchError{} << "ERROR: Failed to output infodata file (Project: " << AnimDataEdited[i]->name << ", Unique Code: " << uniquecode << ")" << endl;
 					return;
 				}
 			}

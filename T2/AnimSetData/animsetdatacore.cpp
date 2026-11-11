@@ -67,8 +67,7 @@ void animSetDataProcess()
 	{
 		if (!createDirectories(folder + "\\$header$"))
 		{
-			cout << "ERROR: Failed to create directory for animationsetdata header file (Project: $header$, Header: $header$)" << endl;
-			Error = true;
+			PatchError{} << "ERROR: Failed to create directory for animationsetdata header file (Project: $header$, Header: $header$)" << endl;
 			return;
 		}
 
@@ -88,8 +87,7 @@ void animSetDataProcess()
 		}
 		else
 		{
-			cout << "ERROR: Failed to output animatiosetndata header file (Project: $header$, Header: $header$)" << endl;
-			Error = true;
+			PatchError{} << "ERROR: Failed to output animatiosetndata header file (Project: $header$, Header: $header$)" << endl;
 			return;
 		}
 	}
@@ -137,8 +135,7 @@ void ProxyProjectSet(int counter, string folder)
 
 	if (!createDirectories(folder + projectname))
 	{
-		cout << "ERROR: Failed to create output directory for animationsetdata (Project: " + projectname + ", Path: " + folder + projectname + ")" << endl;
-		Error = true;
+		PatchError{} << "ERROR: Failed to create output directory for animationsetdata (Project: " + projectname + ", Path: " + folder + projectname + ")" << endl;
 		return;
 	}
 
@@ -159,8 +156,7 @@ void ProxyProjectSet(int counter, string folder)
 	}
 	else
 	{
-		cout << "ERROR: Failed to output animationsetdata header file (Project: " << animSet->project << ", Header: $header$)" << endl;
-		Error = true;
+		PatchError{} << "ERROR: Failed to output animationsetdata header file (Project: " << animSet->project << ", Header: $header$)" << endl;
 		return;
 	}
 
@@ -171,8 +167,7 @@ void ProxyProjectSet(int counter, string folder)
 
 		if (!output.is_open())
 		{
-			cout << "ERROR: Failed to output animationsetdata header file (Project: " << animSet->project << ", Header: " << name << ")" << endl;
-			Error = true;
+			PatchError{} << "ERROR: Failed to output animationsetdata header file (Project: " << animSet->project << ", Header: " << name << ")" << endl;
 			return;
 		}
 
@@ -245,8 +240,7 @@ void ProjectSetProcessing(int i, string folder)
 
 	if (!createDirectories(folder + projectname))
 	{
-		cout << "ERROR: Failed to create new folder (Folder: " << folder << projectname << ")" << endl;
-		Error = true;
+		PatchError{} << "ERROR: Failed to create new folder (Folder: " << folder << projectname << ")" << endl;
 		return;
 	}
 
@@ -316,8 +310,7 @@ void ProjectSetProcessing(int i, string folder)
 		}
 		else
 		{
-			cout << "ERROR: Failed to output animationsetdata header file (Project: " << AnimSetDataEdited[i]->project << ", Header: $header$)" << endl;
-			Error = true;
+			PatchError{} << "ERROR: Failed to output animationsetdata header file (Project: " << AnimSetDataEdited[i]->project << ", Header: $header$)" << endl;
 			return;
 		}
 	}
@@ -769,8 +762,7 @@ void ProjectSetProcessing(int i, string folder)
 			}
 			else
 			{
-				cout << "ERROR: Failed to output animationsetdata header file (Project: " << AnimSetDataEdited[i]->project << ", Header: $header$)" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Failed to output animationsetdata header file (Project: " << AnimSetDataEdited[i]->project << ", Header: $header$)" << endl;
 				return;
 			}
 		}

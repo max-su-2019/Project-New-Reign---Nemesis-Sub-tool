@@ -4,16 +4,18 @@
 
 ## 接口与输出
 
-`HKX_Extractor.dll` 导出 `GenerateBehaviorPatchFiles`。调用方可以通过公开头文件和导入库调用，也可以按导出名加载。四个参数依次是 mod code、原始文件路径、修改后文件路径和补丁输出目录。mod code 接受 4 至 6 位 ASCII 字母或数字，并转为小写。路径采用 UTF-8，支持绝对路径以及相对宿主工作目录的路径。 [接口声明](T2/HKX_Extractor.h#L17) · [导出定义](T2/HKX_Extractor.def) · [调用示例](README.md#L17)
+`HKX_Extractor.dll` 导出 `GenerateBehaviorPatchFiles` 和 `GetBehaviorPatchLastError`。调用方可以通过公开头文件和导入库调用，也可以按导出名加载。生成函数的四个参数依次是 mod code、原始文件路径、修改后文件路径和补丁输出目录。mod code 接受 4 至 6 位 ASCII 字母或数字，并转为小写。路径采用 UTF-8，支持绝对路径以及相对宿主工作目录的路径。 [接口声明](T2/HKX_Extractor.h#L17) · [导出定义](T2/HKX_Extractor.def) · [调用示例](README.md#L17)
 
 | 输入 | 处理与输出 |
 | --- | --- |
-| Behavior XML（`.xml`） | 直接读取 XML，建立并匹配两版行为图，将节点差异文件写到指定目录。 [行为图比较](T2/HKX_Extractor.cpp#L233) |
-| `.hkx` | DLL 根据扩展名为每份输入调用 `hkxcmd.exe`，包括内容已经是 XML 的文件。转换器从 DLL 所在目录或宿主工作目录查找，转换结果写入本次调用的临时目录。 [转换调用](T2/HKX_Extractor.cpp#L163) |
+| Behavior XML（`.xml`） | 直接读取 XML，建立并匹配两版行为图，将节点差异文件写到指定目录。 [行为图比较](T2/HKX_Extractor.cpp#L264) |
+| `.hkx` | DLL 根据扩展名为每份输入调用 `hkxcmd.exe`，包括内容已经是 XML 的文件。转换器从 DLL 所在目录或宿主工作目录查找，转换结果写入本次调用的临时目录。 [转换调用](T2/HKX_Extractor.cpp#L189) |
 | AnimData | 匹配动画项目和事件数据，在指定目录内按项目组织补丁。 [AnimData 处理](T2/AnimData/animdatacore.cpp#L15) |
 | AnimSetData | 匹配动画集项目，在指定目录内按项目组织补丁。 [AnimSetData 处理](T2/AnimSetData/animsetdatacore.cpp#L15) |
 
-比较成功返回 `true`，包括两份输入相同的情况。参数、转换、读取、比较或写入失败时返回 `false`。DLL 实例串行处理调用，每次调用结束清理比较状态。补丁先写入本次调用的临时目录，比较成功后替换目标目录中的同名补丁。发布过程中发生错误时，已发布的文件会尝试回滚。 [API 实现](T2/HKX_Extractor.cpp#L367) · [状态清理](T2/Global.cpp#L92) · [补丁发布](T2/HKX_Extractor.cpp#L305)
+比较成功返回 `true`，包括两份输入相同的情况。收到 `false` 后，可以在同一调用线程通过 `GetBehaviorPatchLastError()` 读取首条失败消息。DLL 拥有返回字符串，其有效期到该线程的下一次生成调用或线程退出。生成调用开始时清空上一条消息。 [API 实现](T2/HKX_Extractor.cpp#L398) · [错误查询](T2/HKX_Extractor.cpp#L504) · [详细用法](README.md#L37)
+
+DLL 实例串行处理生成调用，每次调用结束清理比较状态。补丁先写入本次调用的临时目录，比较成功后替换目标目录中的同名补丁。发布过程中发生错误时，已发布的文件会尝试回滚。 [状态清理](T2/Global.cpp#L122) · [补丁发布](T2/HKX_Extractor.cpp#L336)
 
 ## 构建与验证
 
@@ -26,6 +28,7 @@ Release x64 使用 MSVC 14.44 和 Boost 1.72 构建成功，产物为 `T2/x64/Re
 | Behavior XML | 用含中文和空格的输入及输出路径比较样本。补丁包含修改后的播放速度和 Nemesis 标记。 |
 | 重复调用 | 在同一进程重复生成并替换同名补丁。相同输入返回成功且无新增补丁。短文件、损坏 XML、缺失文件及输出冲突返回失败。 |
 | 多线程调用 | 三个线程调用同一 DLL 实例，在各自目录得到正确的补丁。 |
+| 失败原因 | 验证空参数、非法 mod code、缺失文件和转换器、输入类型不匹配、未注册节点和输出冲突的错误消息。两个调用线程分别读取各自的错误，成功调用后读到空字符串。 |
 | AnimData 和 AnimSetData | 修改动画事件时间生成 1 个补丁。比较 `output.txt` 和 `output2.txt` 生成 3 个补丁文件。 |
 | 转换器调用 | 用替身 `hkxcmd.exe` 验证 DLL 同目录查找、Unicode 路径传参、转换结果读取和临时文件清理。 |
 | XML 格式的 `.hkx` | Python 将两份 Atronach Frost 样本直接传给 API。DLL 用实际的 `hkxcmd.exe` 逐份转换，生成 54 个补丁。 |

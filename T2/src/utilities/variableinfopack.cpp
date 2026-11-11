@@ -57,8 +57,7 @@ string VariableId::getName()
 
 	if (variableInfos.size() <= static_cast<unsigned int>(id))
 	{
-		cout << "Failed to retrieve event name. Variable ID not registered (ID: " << nodeID << ")";
-		Error = true;
+		PatchError{} << "Failed to retrieve event name. Variable ID not registered (ID: " << nodeID << ")";
 		return "";
 	}
 
@@ -75,8 +74,7 @@ string VariableId::getID()
 
 	if (variablePackNode.find(variableNodeId) == variablePackNode.end())
 	{
-		cout << "Failed to retrieve variable id. Variable pack not recognized (ID: " << nodeID << ")";
-		Error = true;
+		PatchError{} << "Failed to retrieve variable id. Variable pack not recognized (ID: " << nodeID << ")";
 		return "";
 	}
 
@@ -97,22 +95,19 @@ bool VariableId::errorCheck()
 {
 	if (!graphroot)
 	{
-		cout << "Failed to retrieve event name. Behavior graph root not found (ID: " << nodeID << ")";
-		Error = true;
+		PatchError{} << "Failed to retrieve event name. Behavior graph root not found (ID: " << nodeID << ")";
 		return false;
 	}
 
 	if (!graphroot->data)
 	{
-		cout << "Failed to retrieve event name. Behavior graph data not found (ID: " << nodeID << ")";
-		Error = true;
+		PatchError{} << "Failed to retrieve event name. Behavior graph data not found (ID: " << nodeID << ")";
 		return false;
 	}
 
 	if (!graphroot->data->variableInfos)
 	{
-		cout << "Failed to retrieve event name. Behavior graph data not found (ID: " << nodeID << ")";
-		Error = true;
+		PatchError{} << "Failed to retrieve event name. Behavior graph data not found (ID: " << nodeID << ")";
 		return false;
 	}
 
@@ -139,8 +134,7 @@ int variableinfopack::getID(string name)
 {
 	if (!hasVariableName(name))
 	{
-		cout << "Failed to retrieve variable id. Variable name not registered (Variable Name: " << name << ")";
-		Error = true;
+		PatchError{} << "Failed to retrieve variable id. Variable name not registered (Variable Name: " << name << ")";
 		return 0x7fffffff;
 	}
 

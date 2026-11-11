@@ -17,6 +17,10 @@ extern "C" {
 HKX_EXTRACTOR_API bool __cdecl GenerateBehaviorPatchFiles(
 	const char* modCode, const char* originalFile, const char* editedFile, const char* outputPath);
 
+// Returns the calling thread's last failure message, or an empty string.
+// DLL-owned storage is valid until the next generation call on this thread or thread exit.
+HKX_EXTRACTOR_API const char* __cdecl GetBehaviorPatchLastError(void);
+
 #undef HKX_EXTRACTOR_API
 
 #ifdef __cplusplus

@@ -356,8 +356,7 @@ void hkbvariablevalueset::match(shared_ptr<hkbobject> counterpart)
 
 	if (size > size2)
 	{
-		cout << "ERROR: Do not delete base data to ensure compatibility with other behavior mods" << endl;
-		Error = true;
+		PatchError{} << "ERROR: Do not delete base data to ensure compatibility with other behavior mods" << endl;
 		throw 5;
 	}
 
@@ -410,8 +409,7 @@ void hkbvariablevalueset::match(shared_ptr<hkbobject> counterpart)
 
 	if (size > size2)
 	{
-		cout << "ERROR: Do not delete base data to ensure compatibility with other behavior mods" << endl;
-		Error = true;
+		PatchError{} << "ERROR: Do not delete base data to ensure compatibility with other behavior mods" << endl;
 		throw 5;
 	}
 

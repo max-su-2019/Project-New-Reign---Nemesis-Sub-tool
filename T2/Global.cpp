@@ -20,7 +20,37 @@
 
 using namespace std;
 
-bool Error = false;
+atomic<bool> Error{false};
+
+namespace
+{
+	string patchErrorMessage;
+}
+
+PatchError::~PatchError() noexcept
+{
+	const bool firstError = !Error.exchange(true);
+	try
+	{
+		const auto message = str();
+		if (firstError)
+		{
+			patchErrorMessage = message;
+		}
+		cout << message;
+		cout.flush();
+	}
+	catch (...)
+	{
+		// A diagnostic failure must not escape the parser or a worker thread.
+	}
+}
+
+const string& PatchErrorMessage()
+{
+	return patchErrorMessage;
+}
+
 bool Debug = false;
 nodelist FunctionLineNew;		// function new data
 nodelist FunctionLineTemp;		// function temp data
@@ -135,6 +165,7 @@ void ResetPatchState()
 	shortFileName.clear();
 	functioncount = 0;
 	stateChange = false;
+	patchErrorMessage.clear();
 	Error = false;
 }
 
@@ -246,8 +277,7 @@ bool IsOldFunctionExt(string filename, shared_ptr<hkbobject> hkb_obj, string add
 
 			if (o_obj == nullptr)
 			{
-				cout << "ERROR: Invalid reference of original (Global)" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Invalid reference of original (Global)" << endl;
 				throw 5;
 			}
 
@@ -262,8 +292,7 @@ bool IsOldFunctionExt(string filename, shared_ptr<hkbobject> hkb_obj, string add
 
 			if (o_obj == nullptr)
 			{
-				cout << "ERROR: Invalid reference of original (Global)" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Invalid reference of original (Global)" << endl;
 				throw 5;
 			}
 
@@ -278,8 +307,7 @@ bool IsOldFunctionExt(string filename, shared_ptr<hkbobject> hkb_obj, string add
 
 			if (o_obj == nullptr)
 			{
-				cout << "ERROR: Invalid reference of original (Global)" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Invalid reference of original (Global)" << endl;
 				throw 5;
 			}
 
@@ -296,8 +324,7 @@ bool IsOldFunctionExt(string filename, shared_ptr<hkbobject> hkb_obj, string add
 
 			if (o_obj == nullptr)
 			{
-				cout << "ERROR: Invalid reference of original (Global)" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Invalid reference of original (Global)" << endl;
 				throw 5;
 			}
 
@@ -312,8 +339,7 @@ bool IsOldFunctionExt(string filename, shared_ptr<hkbobject> hkb_obj, string add
 
 			if (o_obj == nullptr)
 			{
-				cout << "ERROR: Invalid reference of original (Global)" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Invalid reference of original (Global)" << endl;
 				throw 5;
 			}
 
@@ -330,8 +356,7 @@ bool IsOldFunctionExt(string filename, shared_ptr<hkbobject> hkb_obj, string add
 
 			if (o_obj == nullptr)
 			{
-				cout << "ERROR: Invalid reference of original (Global)" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Invalid reference of original (Global)" << endl;
 				throw 5;
 			}
 
@@ -346,8 +371,7 @@ bool IsOldFunctionExt(string filename, shared_ptr<hkbobject> hkb_obj, string add
 
 			if (o_obj == nullptr)
 			{
-				cout << "ERROR: Invalid reference of original (Global)" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Invalid reference of original (Global)" << endl;
 				throw 5;
 			}
 
@@ -362,8 +386,7 @@ bool IsOldFunctionExt(string filename, shared_ptr<hkbobject> hkb_obj, string add
 
 			if (o_obj == nullptr)
 			{
-				cout << "ERROR: Invalid reference of original (Global)" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Invalid reference of original (Global)" << endl;
 				throw 5;
 			}
 
@@ -632,8 +655,7 @@ void conditionCheckAndReplace(string oriID, shared_ptr<hkbobject> hkb_obj)
 
 	if (!genref)
 	{
-		cout << "BUG DETECTED in CrossReference function (ID: " << hkb_obj->ID << ", supposed ID: " << oriID << ")" << endl;
-		Error = true;
+		PatchError{} << "BUG DETECTED in CrossReference function (ID: " << hkb_obj->ID << ", supposed ID: " << oriID << ")" << endl;
 		return;
 	}
 
@@ -765,8 +787,7 @@ bool IsOldRegion(shared_ptr<hkbobject> id, string address, short classcode, bool
 
 			if (!tempparent)
 			{
-				cout << "ERROR: Parent backtracking error (Class: " << tempparent->getClassCode() << ")" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Parent backtracking error (Class: " << tempparent->getClassCode() << ")" << endl;
 				throw 5;
 			}
 
@@ -789,16 +810,14 @@ bool IsOldRegion(shared_ptr<hkbobject> id, string address, short classcode, bool
 					}
 				}
 
-				cout << "ERROR: Parent status tracing error (ID: " << newID << ")" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Parent status tracing error (ID: " << newID << ")" << endl;
 				throw 5;
 			}
 		}
 
 		if (IsForeign.find(tempparent->ID) == IsForeign.end())
 		{
-			cout << "ERROR: Parent status tracing error (ID: " << tempparent->ID << ")" << endl;
-			Error = true;
+			PatchError{} << "ERROR: Parent status tracing error (ID: " << tempparent->ID << ")" << endl;
 			throw 5;
 		}
 
@@ -806,8 +825,7 @@ bool IsOldRegion(shared_ptr<hkbobject> id, string address, short classcode, bool
 
 		if (masterparent->getClassCode() != "cj" && masterparent->getClassCode() != "i")
 		{
-			cout << "ERROR: Class error in pairing (Class: " << masterparent->getClassCode() << ")" << endl;
-			Error = true;
+			PatchError{} << "ERROR: Class error in pairing (Class: " << masterparent->getClassCode() << ")" << endl;
 			throw 5;
 		}
 
@@ -818,8 +836,7 @@ bool IsOldRegion(shared_ptr<hkbobject> id, string address, short classcode, bool
 
 			if (!masterparent)
 			{
-				cout << "ERROR: Parent backtracking error (Class: " << tempparent->getClassCode() << ")" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Parent backtracking error (Class: " << tempparent->getClassCode() << ")" << endl;
 				throw 5;
 			}
 
@@ -862,8 +879,7 @@ bool IsOldRegion(shared_ptr<hkbobject> id, string address, short classcode, bool
 			}
 			else
 			{
-				cout << "ERROR: Missing function address (ID: " << id << ", address: " << masteradd << ")" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Missing function address (ID: " << id << ", address: " << masteradd << ")" << endl;
 				return false;
 			}
 
@@ -931,8 +947,7 @@ bool IsOldRegion(shared_ptr<hkbobject> id, string address, short classcode, bool
 						}
 						else
 						{
-							cout << "ERROR: Missing function address (ID: " << id << ", address: " << masteradd << ")" << endl;
-							Error = true;
+							PatchError{} << "ERROR: Missing function address (ID: " << id << ", address: " << masteradd << ")" << endl;
 						}
 
 						addressChange[address] = tempadd;

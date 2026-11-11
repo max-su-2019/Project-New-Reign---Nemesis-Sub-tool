@@ -914,8 +914,7 @@ void hkbStateMachineExport(string id)
 		}
 		else
 		{
-			cout << "ERROR: Edit hkbStateMachine Output Not Found (File: " << filename << ")" << endl;
-			Error = true;
+			PatchError{} << "ERROR: Edit hkbStateMachine Output Not Found (File: " << filename << ")" << endl;
 		}
 	}
 	else

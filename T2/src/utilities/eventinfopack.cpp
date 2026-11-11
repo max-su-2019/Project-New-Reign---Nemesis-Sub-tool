@@ -59,8 +59,7 @@ string EventId::getName()
 
 	if (eventInfos.size() <= static_cast<unsigned int>(id))
 	{
-		cout << "Failed to retrieve event name. Event ID not registered (ID: " << nodeID << ")";
-		Error = true;
+		PatchError{} << "Failed to retrieve event name. Event ID not registered (ID: " << nodeID << ")";
 		return "";
 	}
 
@@ -77,8 +76,7 @@ string EventId::getID()
 
 	if (eventPackNode.find(eventNodeId) == eventPackNode.end())
 	{
-		cout << "Failed to retrieve event id. Event pack not recognized (ID: " << nodeID << ")";
-		Error = true;
+		PatchError{} << "Failed to retrieve event id. Event pack not recognized (ID: " << nodeID << ")";
 		return "";
 	}
 
@@ -99,22 +97,19 @@ bool EventId::errorCheck()
 {
 	if (!graphroot)
 	{
-		cout << "Failed to retrieve event name. Behavior graph root not found (ID: " << nodeID << ")";
-		Error = true;
+		PatchError{} << "Failed to retrieve event name. Behavior graph root not found (ID: " << nodeID << ")";
 		return false;
 	}
 
 	if (!graphroot->data)
 	{
-		cout << "Failed to retrieve event name. Behavior graph data not found (ID: " << nodeID << ")";
-		Error = true;
+		PatchError{} << "Failed to retrieve event name. Behavior graph data not found (ID: " << nodeID << ")";
 		return false;
 	}
 
 	if (!graphroot->data->eventInfos)
 	{
-		cout << "Failed to retrieve event name. Behavior graph data not found (ID: " << nodeID << ")";
-		Error = true;
+		PatchError{} << "Failed to retrieve event name. Behavior graph data not found (ID: " << nodeID << ")";
 		return false;
 	}
 
@@ -141,8 +136,7 @@ size_t eventinfopack::getID(string name)
 {
 	if (!hasEventName(name))
 	{
-		cout << "Failed to retrieve event id. Event name not registered (Event Name: " << name << ")";
-		Error = true;
+		PatchError{} << "Failed to retrieve event id. Event name not registered (Event Name: " << name << ")";
 		return 0x7fffffff;
 	}
 

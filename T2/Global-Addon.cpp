@@ -199,8 +199,7 @@ vecstr GetElements(string number, unordered_map<string, vecstr>& functionlines, 
 				{
 					if (element.length() == 0 || element[0] != '#')
 					{
-						cout << "ERROR: Invalid element. (Element: " << element << ")" << endl;
-						Error = true;
+						PatchError{} << "ERROR: Invalid element. (Element: " << element << ")" << endl;
 						return elements;
 					}
 					else

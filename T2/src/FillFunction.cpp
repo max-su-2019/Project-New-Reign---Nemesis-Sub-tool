@@ -533,8 +533,7 @@ shared_ptr<hkbobject> GetHKXClass(string classname, string id)
 	}
 	else
 	{
-		cout << "ERROR: Edit Class Not Found (Classname: " << classname << ", ID: " << id << ")" << endl;
-		Error = true;
+		PatchError{} << "ERROR: Edit Class Not Found (Classname: " << classname << ", ID: " << id << ")" << endl;
 		throw false;
 	}
 }

@@ -7,8 +7,7 @@ bool matchProjectScoring(vector<shared_ptr<AnimDataProject>>& ori, vector<shared
 {
 	if (ori.size() == 0)
 	{
-		cout << "ERROR: Empty project detected (File: " << filename << ")" << endl;
-		Error = true;
+		PatchError{} << "ERROR: Empty project detected (File: " << filename << ")" << endl;
 		return false;
 	}
 
@@ -121,8 +120,7 @@ bool matchProjectScoring(vector<AnimDataPack>& ori, vector<AnimDataPack>& edit, 
 			{
 				if (IsExist[ori[i].name][ori[i].uniquecode])
 				{
-					cout << "ERROR: Duplicated anim data detected" << endl;
-					Error = true;
+					PatchError{} << "ERROR: Duplicated anim data detected" << endl;
 					return false;
 				}
 
@@ -227,8 +225,7 @@ bool matchProjectScoring(vector<InfoDataPack>& ori, vector<InfoDataPack>& edit, 
 		{
 			if (IsExist[ori[i].uniquecode])
 			{
-				cout << "ERROR: Duplicated info data detected" << endl;
-				Error = true;
+				PatchError{} << "ERROR: Duplicated info data detected" << endl;
 				return false;
 			}
 

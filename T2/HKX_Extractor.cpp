@@ -4,6 +4,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+#include <cstdio>
 #include <limits>
 #include <mutex>
 #include <sstream>
@@ -24,10 +25,35 @@ namespace fs = boost::filesystem;
 namespace
 {
 	std::mutex patchMutex;
+	thread_local char lastError[4096] = {};
+
+	bool Fail(const char* message, const char* detail = nullptr) noexcept
+	{
+		if (!lastError[0])
+		{
+			if (detail && *detail)
+			{
+				std::snprintf(lastError, sizeof(lastError), "%s: %s", message, detail);
+			}
+			else
+			{
+				std::snprintf(lastError, sizeof(lastError), "%s", message);
+			}
+		}
+		return false;
+	}
 
 	struct PatchState
 	{
-		~PatchState() { ResetPatchState(); }
+		~PatchState()
+		{
+			const auto& message = PatchErrorMessage();
+			if (!message.empty())
+			{
+				Fail(message.c_str());
+			}
+			ResetPatchState();
+		}
 	};
 
 	struct PatchWorkspace
@@ -168,9 +194,14 @@ namespace
 		}
 
 		const auto converter = FindConverter();
-		if (boost::process::system(converter, L"convert", L"-v:XML", source.native(), converted.native()) != 0)
+		const int exitCode = boost::process::system(converter, L"convert", L"-v:XML", source.native(), converted.native());
+		if (exitCode != 0)
 		{
-			throw std::runtime_error("HKX conversion failed");
+			throw std::runtime_error("hkxcmd.exe exited with code " + std::to_string(exitCode));
+		}
+		if (!fs::is_regular_file(converted))
+		{
+			throw std::runtime_error("hkxcmd.exe did not create a converted file");
 		}
 		return ReadInput(converted);
 	}
@@ -367,12 +398,14 @@ namespace
 extern "C" bool __cdecl GenerateBehaviorPatchFiles(
 	const char* modCode, const char* originalFile, const char* editedFile, const char* outputPath)
 {
+	lastError[0] = '\0';
 	if (!modCode || !originalFile || !editedFile || !outputPath
 		|| !*modCode || !*originalFile || !*editedFile || !*outputPath)
 	{
-		return false;
+		return Fail("modCode, originalFile, editedFile and outputPath must all be non-empty");
 	}
 
+	const char* phase = "Preparing patch inputs";
 	try
 	{
 		const std::lock_guard<std::mutex> lock(patchMutex);
@@ -381,19 +414,35 @@ extern "C" bool __cdecl GenerateBehaviorPatchFiles(
 		const auto originalPath = fs::absolute(PathFromUtf8(originalFile));
 		const auto editedPath = fs::absolute(PathFromUtf8(editedFile));
 		const auto output = fs::absolute(PathFromUtf8(outputPath));
-		if (!fs::is_regular_file(originalPath) || !fs::is_regular_file(editedPath))
+		if (!fs::is_regular_file(originalPath))
 		{
-			return false;
+			return Fail("Original input is missing or is not a regular file", originalFile);
+		}
+		if (!fs::is_regular_file(editedPath))
+		{
+			return Fail("Edited input is missing or is not a regular file", editedFile);
 		}
 
+		phase = "Preparing patch output directory";
 		fs::create_directories(output);
 		PatchWorkspace workspace(output);
+		phase = "Loading original input";
 		auto original = LoadInput(originalPath, workspace.directory / L"original.hkx");
-		auto edited = LoadInput(editedPath, workspace.directory / L"edited.hkx");
-		if (original.type == InputType::unknown || original.type != edited.type)
+		if (original.type == InputType::unknown)
 		{
-			return false;
+			return Fail("Unsupported original input format", originalFile);
 		}
+		phase = "Loading edited input";
+		auto edited = LoadInput(editedPath, workspace.directory / L"edited.hkx");
+		if (edited.type == InputType::unknown)
+		{
+			return Fail("Unsupported edited input format", editedFile);
+		}
+		if (original.type != edited.type)
+		{
+			return Fail("Original and edited inputs have different formats");
+		}
+		phase = "Comparing patch inputs";
 		if (original.lines == edited.lines)
 		{
 			if (original.type == InputType::behavior)
@@ -429,23 +478,30 @@ extern "C" bool __cdecl GenerateBehaviorPatchFiles(
 			if (!Error) animSetDataProcess();
 			break;
 		default:
-			return false;
+			return Fail("Unsupported input format");
 		}
 		if (Error)
 		{
-			return false;
+			return Fail("Patch generation failed", PatchErrorMessage().c_str());
 		}
 
+		phase = "Publishing patch files";
 		PublishPatches(workspace, source, output, originalPath, editedPath);
 		return true;
 	}
 	catch (const std::exception& error)
 	{
-		OutputDebugStringA(error.what());
+		Fail(phase, error.what());
+		OutputDebugStringA(lastError);
 		return false;
 	}
 	catch (...)
 	{
-		return false;
+		return Fail(phase, "Unexpected internal error");
 	}
+}
+
+extern "C" const char* __cdecl GetBehaviorPatchLastError(void)
+{
+	return lastError;
 }

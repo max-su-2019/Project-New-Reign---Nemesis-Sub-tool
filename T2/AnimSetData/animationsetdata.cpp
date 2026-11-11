@@ -23,8 +23,7 @@ AnimSetDataProject::AnimSetDataProject(int& startline, vecstr& animdatafile, str
 
 		if (startline >= int(animdatafile.size()))
 		{
-			cout << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << ")" << endl;
-			Error = true;
+			PatchError{} << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << ")" << endl;
 			return;
 		}
 
@@ -46,14 +45,12 @@ void DataPackProcess(map<string, datapack, alphanum_less>& storeline, int& start
 {
 	if (startline >= int(animdatafile.size()))
 	{
-		cout << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: Header)" << endl;
-		Error = true;
+		PatchError{} << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: Header)" << endl;
 		return;
 	}
 	else if (!isOnlyNumber(animdatafile[startline]))
 	{
-		cout << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: Header)" << endl;
-		Error = true;
+		PatchError{} << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: Header)" << endl;
 		return;
 	}
 
@@ -65,8 +62,7 @@ void DataPackProcess(map<string, datapack, alphanum_less>& storeline, int& start
 
 		if (i + 4 >= int(animdatafile.size()))
 		{
-			cout << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: Header)" << endl;
-			Error = true;
+			PatchError{} << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: Header)" << endl;
 			return;
 		}
 
@@ -82,14 +78,12 @@ void EquipPackProcess(std::vector<equip>& storeline, int& startline, vecstr& ani
 {
 	if (startline >= int(animdatafile.size()))
 	{
-		cout << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-		Error = true;
+		PatchError{} << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 		return;
 	}
 	else if (!isOnlyNumber(animdatafile[startline]))
 	{
-		cout << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-		Error = true;
+		PatchError{} << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 		return;
 	}
 
@@ -108,8 +102,7 @@ void EquipPackProcess(std::vector<equip>& storeline, int& startline, vecstr& ani
 
 		if (i + 1 >= int(animdatafile.size()))
 		{
-			cout << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-			Error = true;
+			PatchError{} << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 			return;
 		}
 	}
@@ -119,14 +112,12 @@ void TypePackProcess(vector<typepack>& storeline, int& startline, vecstr& animda
 {
 	if (startline >= int(animdatafile.size()))
 	{
-		cout << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-		Error = true;
+		PatchError{} << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 		return;
 	}
 	else if (!isOnlyNumber(animdatafile[startline]))
 	{
-		cout << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-		Error = true;
+		PatchError{} << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 		return;
 	}
 
@@ -163,8 +154,7 @@ void TypePackProcess(vector<typepack>& storeline, int& startline, vecstr& animda
 
 		if (isOnlyNumber(animdatafile[i]) || !hasAlpha(animdatafile[i]))
 		{
-			cout << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-			Error = true;
+			PatchError{} << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 			return;
 		}
 
@@ -172,14 +162,12 @@ void TypePackProcess(vector<typepack>& storeline, int& startline, vecstr& animda
 
 		if (++i >= int(animdatafile.size()))
 		{
-			cout << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-			Error = true;
+			PatchError{} << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 			return;
 		}
 		else if (!isOnlyNumber(animdatafile[i]))
 		{
-			cout << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-			Error = true;
+			PatchError{} << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 			return;
 		}
 
@@ -187,14 +175,12 @@ void TypePackProcess(vector<typepack>& storeline, int& startline, vecstr& animda
 
 		if (++i >= int(animdatafile.size()))
 		{
-			cout << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-			Error = true;
+			PatchError{} << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 			return;
 		}
 		else if (!isOnlyNumber(animdatafile[i]))
 		{
-			cout << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-			Error = true;
+			PatchError{} << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 			return;
 		}
 
@@ -203,8 +189,7 @@ void TypePackProcess(vector<typepack>& storeline, int& startline, vecstr& animda
 
 		if (i + 1 >= int(animdatafile.size()))
 		{
-			cout << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-			Error = true;
+			PatchError{} << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 			return;
 		}
 	}
@@ -214,14 +199,12 @@ void AnimPackProcess(vector<animpack>& storeline, int& startline, vecstr& animda
 {
 	if (startline >= int(animdatafile.size()))
 	{
-		cout << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-		Error = true;
+		PatchError{} << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 		return;
 	}
 	else if (!isOnlyNumber(animdatafile[startline]))
 	{
-		cout << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-		Error = true;
+		PatchError{} << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 		return;
 	}
 
@@ -276,14 +259,12 @@ void AnimPackProcess(vector<animpack>& storeline, int& startline, vecstr& animda
 
 		if (i >= int(animdatafile.size()))
 		{
-			cout << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-			Error = true;
+			PatchError{} << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 			return;
 		}
 		else if (!isOnlyNumber(animdatafile[i]))
 		{
-			cout << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-			Error = true;
+			PatchError{} << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 			return;
 		}
 
@@ -370,8 +351,7 @@ void AnimPackProcess(vector<animpack>& storeline, int& startline, vecstr& animda
 
 		if (i + 1 >= int(animdatafile.size()))
 		{
-			cout << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-			Error = true;
+			PatchError{} << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 			return;
 		}
 	}
@@ -381,14 +361,12 @@ void CRC32Process(vector<crc32>& storeline, int& startline, vecstr& animdatafile
 {
 	if (startline >= int(animdatafile.size()))
 	{
-		cout << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-		Error = true;
+		PatchError{} << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 		return;
 	}
 	else if (!isOnlyNumber(animdatafile[startline]))
 	{
-		cout << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-		Error = true;
+		PatchError{} << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 		return;
 	}
 
@@ -412,8 +390,7 @@ void CRC32Process(vector<crc32>& storeline, int& startline, vecstr& animdatafile
 
 		if (!isOnlyNumber(animdatafile[i]))
 		{
-			cout << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-			Error = true;
+			PatchError{} << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 			return;
 		}
 
@@ -421,14 +398,12 @@ void CRC32Process(vector<crc32>& storeline, int& startline, vecstr& animdatafile
 
 		if (++i >= int(animdatafile.size()))
 		{
-			cout << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-			Error = true;
+			PatchError{} << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 			return;
 		}
 		else if (!isOnlyNumber(animdatafile[i]))
 		{
-			cout << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-			Error = true;
+			PatchError{} << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 			return;
 		}
 
@@ -436,14 +411,12 @@ void CRC32Process(vector<crc32>& storeline, int& startline, vecstr& animdatafile
 
 		if (++i >= int(animdatafile.size()))
 		{
-			cout << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-			Error = true;
+			PatchError{} << "Missing information in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 			return;
 		}
 		else if (!isOnlyNumber(animdatafile[i]))
 		{
-			cout << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
-			Error = true;
+			PatchError{} << "Invalid format has been detected in \"animationsetdatasinglefile.txt\" (Project: " << filename << "Header: " << header << ")" << endl;
 			return;
 		}
 
@@ -527,8 +500,7 @@ void animSetDataInitialize(string filepath, vecstr& catalyst, vector<shared_ptr<
 
 			if (animDataSetHeader[project].size() != 1)
 			{
-				cout << "ERROR: BUG FOUND!! Report to Nemesis' author immediately (File: " << filepath << ", Line: " << i + 1 << endl;
-				Error = true;
+				PatchError{} << "ERROR: BUG FOUND!! Report to Nemesis' author immediately (File: " << filepath << ", Line: " << i + 1 << endl;
 				return;
 			}
 
@@ -543,8 +515,7 @@ void animSetDataInitialize(string filepath, vecstr& catalyst, vector<shared_ptr<
 				{
 					if (headercounter >= animDataSetHeader[project].size())
 					{
-						cout << "ERROR: Un-registered header has been detected in \"animationsetdatasinglefile.txt\" (File: " << filepath << ", Line: " << i + 1 << endl;
-						Error = true;
+						PatchError{} << "ERROR: Un-registered header has been detected in \"animationsetdatasinglefile.txt\" (File: " << filepath << ", Line: " << i + 1 << endl;
 						return;
 					}
 
@@ -563,8 +534,7 @@ void animSetDataInitialize(string filepath, vecstr& catalyst, vector<shared_ptr<
 				}
 				else
 				{
-					cout << "ERROR: Invalid format has been detected in \"animationsetdatasinglefile.txt\" (File: " << filepath << ", Line: " << i + 1 << ")" << endl;
-					Error = true;
+					PatchError{} << "ERROR: Invalid format has been detected in \"animationsetdatasinglefile.txt\" (File: " << filepath << ", Line: " << i + 1 << ")" << endl;
 					return;
 				}
 
@@ -576,8 +546,7 @@ void animSetDataInitialize(string filepath, vecstr& catalyst, vector<shared_ptr<
 		{
 			if (headercounter >= animDataSetHeader[project].size())
 			{
-				cout << "ERROR: Un-registered header has been detected in \"animationsetdatasinglefile.txt\" (File: " << filepath << ", Line: " << i + 1 << endl;
-				Error = true;
+				PatchError{} << "ERROR: Un-registered header has been detected in \"animationsetdatasinglefile.txt\" (File: " << filepath << ", Line: " << i + 1 << endl;
 				return;
 			}
 
@@ -627,8 +596,7 @@ void animSetDataInitialize(string filepath, vecstr& catalyst, vector<shared_ptr<
 
 			if (animDataSetHeader[project].size() != 1)
 			{
-				cout << "ERROR: BUG FOUND!! Report to Nemesis' author immediately (File: " << filepath << ", Line: " << i + 1 << endl;
-				Error = true;
+				PatchError{} << "ERROR: BUG FOUND!! Report to Nemesis' author immediately (File: " << filepath << ", Line: " << i + 1 << endl;
 				return;
 			}
 
@@ -643,8 +611,7 @@ void animSetDataInitialize(string filepath, vecstr& catalyst, vector<shared_ptr<
 				{
 					if (headercounter >= animDataSetHeader[project].size())
 					{
-						cout << "ERROR: Un-registered header has been detected in \"animationsetdatasinglefile.txt\" (File: " << filepath << ", Line: " << i + 1 << endl;
-						Error = true;
+						PatchError{} << "ERROR: Un-registered header has been detected in \"animationsetdatasinglefile.txt\" (File: " << filepath << ", Line: " << i + 1 << endl;
 						return;
 					}
 
@@ -663,8 +630,7 @@ void animSetDataInitialize(string filepath, vecstr& catalyst, vector<shared_ptr<
 				}
 				else
 				{
-					cout << "ERROR: Invalid format has been detected in \"animationsetdatasinglefile.txt\" (File: " << filepath << ", Line: " << i + 1 << ")" << endl;
-					Error = true;
+					PatchError{} << "ERROR: Invalid format has been detected in \"animationsetdatasinglefile.txt\" (File: " << filepath << ", Line: " << i + 1 << ")" << endl;
 					return;
 				}
 
@@ -676,8 +642,7 @@ void animSetDataInitialize(string filepath, vecstr& catalyst, vector<shared_ptr<
 		{
 			if (headercounter >= animDataSetHeader[project].size() - 1)
 			{
-				cout << "ERROR: Un-registered header has been detected in \"animationsetdatasinglefile.txt\" (File: " << filepath << ", Line: " << i + 1 << endl;
-				Error = true;
+				PatchError{} << "ERROR: Un-registered header has been detected in \"animationsetdatasinglefile.txt\" (File: " << filepath << ", Line: " << i + 1 << endl;
 				return;
 			}
 

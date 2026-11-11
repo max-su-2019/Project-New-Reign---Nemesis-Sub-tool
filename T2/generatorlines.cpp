@@ -46,8 +46,7 @@ bool generatorLines(vecstr& storeline1, vecstr& storeline2, string id, string cl
 	}
 	else
 	{
-		cout << "ERROR: Edit " << classname << " Input Not Found (ID: " << id << ")" << endl;
-		Error = true;
+		PatchError{} << "ERROR: Edit " << classname << " Input Not Found (ID: " << id << ")" << endl;
 	}
 
 	//stage 2 reading and identifying edits
@@ -90,8 +89,7 @@ bool generatorLines(vecstr& storeline1, vecstr& storeline2, string id, string cl
 	}
 	else
 	{
-		cout << "ERROR: Edit " << classname << " Output Not Found (ID: " << id << ")" << endl;
-		Error = true;
+		PatchError{} << "ERROR: Edit " << classname << " Output Not Found (ID: " << id << ")" << endl;
 		return false;
 	}
 
@@ -107,8 +105,7 @@ bool generatorLines(vecstr& storeline1, vecstr& storeline2, string id, string cl
 
 	if (origen.size() != newgen.size())
 	{
-		cout << classname << " generator bug detected (ID: " << id << ")" << endl;
-		Error = true;
+		PatchError{} << classname << " generator bug detected (ID: " << id << ")" << endl;
 		return false;
 	}
 
@@ -186,8 +183,7 @@ bool generatorMatch(vecstr& ori, vecstr& edit, string id, string classname)
 {
 	if (ori.size() == 0)
 	{
-		cout << "ERROR: " << classname << " empty original trigger (ID: " << id << ")" << endl;
-		Error = true;
+		PatchError{} << "ERROR: " << classname << " empty original trigger (ID: " << id << ")" << endl;
 		return false;
 	}
 

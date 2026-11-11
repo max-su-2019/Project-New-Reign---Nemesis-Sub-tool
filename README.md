@@ -34,4 +34,17 @@ Behavior patches are written directly into the requested directory. AnimData and
 
 The function returns `true` when comparison succeeds, including inputs with no changes, and `false` on failure. Pair inputs of the same type and use the same first-person or third-person variant for Behavior. The DLL runs `hkxcmd.exe` on each `.hkx` input before comparing it, including files that already contain Havok XML. Place the converter beside the DLL or in the host's working directory. Use the `.xml` extension for Havok XML you want the DLL to read directly.
 
+## Read an error
+
+After `GenerateBehaviorPatchFiles` returns `false`, call `GetBehaviorPatchLastError()` on the same thread. It returns a NUL-terminated message of up to 4095 bytes. The DLL owns the string, which is valid until the next generation call on that thread or thread exit. The function returns an empty string before the first call and after a successful call.
+
+```cpp
+if (!ok) {
+    const char* message = GetBehaviorPatchLastError();
+    // Display the message or copy it into your application's log.
+}
+```
+
+For Python `ctypes`, set the getter's `argtypes` to `()` and its `restype` to `ctypes.c_char_p`. The getter returns the message as Python bytes.
+
 [Implementation review](IMPLEMENTATION_REVIEW.md)

@@ -649,8 +649,7 @@ void hkbStateMachineStateInfoExport(string id)
 	}
 	else
 	{
-		cout << "ERROR: Edit hkbStateMachineStateInfo Output Not Found (ID: " << id << ")" << endl;
-		Error = true;
+		PatchError{} << "ERROR: Edit hkbStateMachineStateInfo Output Not Found (ID: " << id << ")" << endl;
 	}
 
 	NemesisReaderFormat(stoi(id.substr(1)), storeline2);
@@ -675,8 +674,7 @@ void hkbStateMachineStateInfoExport(string id)
 		}
 		else
 		{
-			cout << "ERROR: Edit hkbStateMachineStateInfo Output Not Found (File: " << filename << ")" << endl;
-			Error = true;
+			PatchError{} << "ERROR: Edit hkbStateMachineStateInfo Output Not Found (File: " << filename << ")" << endl;
 		}
 	}
 	else

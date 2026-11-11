@@ -724,8 +724,7 @@ void hkbbehaviorgraphstringdata::newNode()
 	{
 		if (eventNames->scan_done)
 		{
-			cout << "ERROR: node " << ID << "has been referenced as original and newly created" << endl;
-			Error = true;
+			PatchError{} << "ERROR: node " << ID << "has been referenced as original and newly created" << endl;
 			throw 5;
 		}
 
@@ -755,8 +754,7 @@ void hkbbehaviorgraphstringdata::newNode()
 	{
 		if (attributeNames->scan_done)
 		{
-			cout << "ERROR: node " << ID << "has been referenced as original and newly created" << endl;
-			Error = true;
+			PatchError{} << "ERROR: node " << ID << "has been referenced as original and newly created" << endl;
 			throw 5;
 		}
 
@@ -786,8 +784,7 @@ void hkbbehaviorgraphstringdata::newNode()
 	{
 		if (variableNames->scan_done)
 		{
-			cout << "ERROR: node " << ID << "has been referenced as original and newly created" << endl;
-			Error = true;
+			PatchError{} << "ERROR: node " << ID << "has been referenced as original and newly created" << endl;
 			throw 5;
 		}
 
@@ -817,8 +814,7 @@ void hkbbehaviorgraphstringdata::newNode()
 	{
 		if (characterPropertyNames->scan_done)
 		{
-			cout << "ERROR: node " << ID << "has been referenced as original and newly created" << endl;
-			Error = true;
+			PatchError{} << "ERROR: node " << ID << "has been referenced as original and newly created" << endl;
 			throw 5;
 		}
 

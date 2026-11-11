@@ -8,8 +8,7 @@ bool matchProjectScoring(vector<shared_ptr<AnimSetDataProject>>& ori, vector<sha
 {
 	if (ori.size() == 0)
 	{
-		cout << "ERROR: Empty project detected (File: " << filename << ")" << endl;
-		Error = true;
+		PatchError{} << "ERROR: Empty project detected (File: " << filename << ")" << endl;
 		return false;
 	}
 
@@ -72,8 +71,7 @@ bool matchDataScoring(map<string, datapack, alphanum_less>& ori, map<string, dat
 {
 	if (ori.size() == 0)
 	{
-		cout << "ERROR: Empty datalist detected (File: " << filename << ")" << endl;
-		Error = true;
+		PatchError{} << "ERROR: Empty datalist detected (File: " << filename << ")" << endl;
 		return false;
 	}
 

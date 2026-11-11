@@ -57,8 +57,7 @@ void BehaviorListProcess(AnimDataProject& storeline, int& startline, vecstr& ani
 {
 	if (!isOnlyNumber(animdatafile[startline]))
 	{
-		cout << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
-		Error = true;
+		PatchError{} << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
 		throw 1;
 	}
 
@@ -66,8 +65,7 @@ void BehaviorListProcess(AnimDataProject& storeline, int& startline, vecstr& ani
 
 	if (i + 3 >= int(animdatafile.size()))
 	{
-		cout << "Missing project information for a project in \"animationdatasinglefile.txt\"" << endl << "Project: " << project << endl;
-		Error = true;
+		PatchError{} << "Missing project information for a project in \"animationdatasinglefile.txt\"" << endl << "Project: " << project << endl;
 		throw 1;
 	}
 
@@ -82,8 +80,7 @@ void BehaviorListProcess(AnimDataProject& storeline, int& startline, vecstr& ani
 		}
 		else
 		{
-			cout << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
-			Error = true;
+			PatchError{} << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
 			throw 1;
 		}
 	}
@@ -93,8 +90,7 @@ void BehaviorListProcess(AnimDataProject& storeline, int& startline, vecstr& ani
 
 	if (i < int(animdatafile.size()) && !hasAlpha(animdatafile[i]))
 	{
-		cout << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
-		Error = true;
+		PatchError{} << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
 		throw 1;
 	}
 }
@@ -105,8 +101,7 @@ void AnimDataProcess(vector<AnimDataPack>& storeline, int& startline, vecstr& an
 	{
 		if (!hasAlpha(animdatafile[i]))
 		{
-			cout << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
-			Error = true;
+			PatchError{} << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
 			throw 1;
 		}
 
@@ -114,8 +109,7 @@ void AnimDataProcess(vector<AnimDataPack>& storeline, int& startline, vecstr& an
 
 		if (!isOnlyNumber(animdatafile[i]))
 		{
-			cout << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
-			Error = true;
+			PatchError{} << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
 			throw 1;
 		}
 
@@ -127,8 +121,7 @@ void AnimDataProcess(vector<AnimDataPack>& storeline, int& startline, vecstr& an
 
 		if (!isOnlyNumber(animdatafile[i]))
 		{
-			cout << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
-			Error = true;
+			PatchError{} << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
 			throw 1;
 		}
 
@@ -136,8 +129,7 @@ void AnimDataProcess(vector<AnimDataPack>& storeline, int& startline, vecstr& an
 
 		if (!isOnlyNumber(animdatafile[i]))
 		{
-			cout << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
-			Error = true;
+			PatchError{} << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
 			throw 1;
 		}
 
@@ -145,8 +137,7 @@ void AnimDataProcess(vector<AnimDataPack>& storeline, int& startline, vecstr& an
 
 		if (!isOnlyNumber(animdatafile[i]))
 		{
-			cout << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
-			Error = true;
+			PatchError{} << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
 			throw 1;
 		}
 
@@ -154,8 +145,7 @@ void AnimDataProcess(vector<AnimDataPack>& storeline, int& startline, vecstr& an
 
 		if (!isOnlyNumber(animdatafile[i++]))
 		{
-			cout << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
-			Error = true;
+			PatchError{} << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
 			throw 1;
 		}
 
@@ -169,8 +159,7 @@ void AnimDataProcess(vector<AnimDataPack>& storeline, int& startline, vecstr& an
 
 		if (animdatafile[i++].length() != 0)
 		{
-			cout << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
-			Error = true;
+			PatchError{} << "Invalid format for \"animationdatasinglefile.txt\" in AnimData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Header: Header" << endl;
 			throw 1;
 		}
 
@@ -196,8 +185,7 @@ void InfoDataProcess(vector<InfoDataPack>& storeline, int& startline, vecstr& an
 	{
 		if (!isOnlyNumber(animdatafile[i]))
 		{
-			cout << "Invalid format for \"animationdatasinglefile.txt\" in InfoData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Unique Code: " << animdatafile[i] << endl;
-			Error = true;
+			PatchError{} << "Invalid format for \"animationdatasinglefile.txt\" in InfoData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Unique Code: " << animdatafile[i] << endl;
 			throw 1;
 		}
 
@@ -208,8 +196,7 @@ void InfoDataProcess(vector<InfoDataPack>& storeline, int& startline, vecstr& an
 
 		if (isExist[uniquecode])
 		{
-			cout << "Duplicated unique code detected in InfoData section. Please contact the template creator" << endl << "Project: " << project << endl << "Unique Code: " << uniquecode << endl;
-			Error = true;
+			PatchError{} << "Duplicated unique code detected in InfoData section. Please contact the template creator" << endl << "Project: " << project << endl << "Unique Code: " << uniquecode << endl;
 			throw 1;
 		}
 
@@ -217,8 +204,7 @@ void InfoDataProcess(vector<InfoDataPack>& storeline, int& startline, vecstr& an
 
 		if (!isOnlyNumber(animdatafile[i]))
 		{
-			cout << "Invalid format for \"animationdatasinglefile.txt\" in InfoData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Unique Code: " << uniquecode << endl;
-			Error = true;
+			PatchError{} << "Invalid format for \"animationdatasinglefile.txt\" in InfoData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Unique Code: " << uniquecode << endl;
 			throw 1;
 		}
 
@@ -226,8 +212,7 @@ void InfoDataProcess(vector<InfoDataPack>& storeline, int& startline, vecstr& an
 
 		if (!isOnlyNumber(animdatafile[++i]))
 		{
-			cout << "Invalid format for \"animationdatasinglefile.txt\" in InfoData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Unique Code: " << uniquecode << endl;
-			Error = true;
+			PatchError{} << "Invalid format for \"animationdatasinglefile.txt\" in InfoData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Unique Code: " << uniquecode << endl;
 			throw 1;
 		}
 
@@ -240,8 +225,7 @@ void InfoDataProcess(vector<InfoDataPack>& storeline, int& startline, vecstr& an
 
 		if (!isOnlyNumber(animdatafile[i++]))
 		{
-			cout << "Invalid format for \"animationdatasinglefile.txt\" in InfoData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Unique Code: " << uniquecode << endl;
-			Error = true;
+			PatchError{} << "Invalid format for \"animationdatasinglefile.txt\" in InfoData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Unique Code: " << uniquecode << endl;
 			throw 1;
 		}
 
@@ -252,8 +236,7 @@ void InfoDataProcess(vector<InfoDataPack>& storeline, int& startline, vecstr& an
 
 		if (animdatafile[i].length() != 0)
 		{
-			cout << "Invalid format for \"animationdatasinglefile.txt\" in InfoData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Unique Code: " << uniquecode << endl;
-			Error = true;
+			PatchError{} << "Invalid format for \"animationdatasinglefile.txt\" in InfoData section has been detected. Please contact the template creator" << endl << "Project: " << project << endl << "Unique Code: " << uniquecode << endl;
 			throw 1;
 		}
 
@@ -467,8 +450,7 @@ void animDataInitialize(string filepath, vecstr& catalyst, vector<shared_ptr<Ani
 
 			if (combined.size() == 0)
 			{
-				cout << "Empty project detected. Could be a bug. Report to Nemesis' author if you are sure" << endl << "Project: " << project << endl;
-				Error = true;
+				PatchError{} << "Empty project detected. Could be a bug. Report to Nemesis' author if you are sure" << endl << "Project: " << project << endl;
 				return;
 			}
 

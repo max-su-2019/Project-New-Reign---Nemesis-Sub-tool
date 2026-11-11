@@ -1,7 +1,9 @@
 #ifndef GLOBAL_H_
 #define GLOBAL_H_
 
+#include <atomic>
 #include <set>
+#include <sstream>
 #include <condition_variable>
 
 #include <sys/stat.h>
@@ -18,7 +20,16 @@ struct hkbobject;
 
 typedef std::unordered_map<std::string, std::string> mapstring;
 
-extern bool Error;
+extern std::atomic<bool> Error;
+
+class PatchError : public std::ostringstream
+{
+public:
+	~PatchError() noexcept;
+};
+
+const std::string& PatchErrorMessage();
+
 extern bool Debug;
 extern nodelist FunctionLineNew;
 extern nodelist FunctionLineTemp;

@@ -122,8 +122,7 @@ vector<orderPair> highestScore(map<int, map<int, int>> scorelist, size_t origina
 
 			if (isNew.size() != size - originalSize)
 			{
-				cout << "ERROR: Highest Score bug detected. Extra size: " << isNew.size() << ", New size: " << size << ", Original size: " << originalSize << endl;
-				Error = true;
+				PatchError{} << "ERROR: Highest Score bug detected. Extra size: " << isNew.size() << ", New size: " << size << ", Original size: " << originalSize << endl;
 				throw 5;
 			}
 		}
@@ -250,8 +249,7 @@ vector<orderPair> highestScore(map<int, map<int, double>> scorelist, size_t orig
 
 			if (isNew.size() != size - originalSize)
 			{
-				cout << "ERROR: Highest Score bug detected. Extra size: " << isNew.size() << ", New size: " << size << ", Original size: " << originalSize << endl;
-				Error = true;
+				PatchError{} << "ERROR: Highest Score bug detected. Extra size: " << isNew.size() << ", New size: " << size << ", Original size: " << originalSize << endl;
 				throw 5;
 			}
 		}
