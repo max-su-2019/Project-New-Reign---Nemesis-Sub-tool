@@ -1,10 +1,7 @@
-#include <boost\thread.hpp>
-#include <boost\asio\thread_pool.hpp>
-#include <boost\asio\post.hpp>
-
 #include "animdatacore.h"
 #include "animdatamatch.h"
-#include "readdirectory.hpp"
+
+#include <boost/filesystem/operations.hpp>
 
 #include "src\utilities\nemesisformat.h"
 
@@ -77,7 +74,7 @@ void animDataProcess()
 			return;
 		}
 
-		ofstream outputfile(folder + "\\$header$\\$header$.txt");
+		auto outputfile = OpenPatchFile(folder + "\\$header$\\$header$.txt");
 
 		if (outputfile.is_open())
 		{
@@ -100,13 +97,12 @@ void animDataProcess()
 		}
 	}
 
-	boost::asio::thread_pool multithreads;
 
 	for (unsigned int i = 0; i < AnimDataOriginal.size(); ++i)
 	{
 		if (AnimDataOriginal[i]->proxy)		// added project
 		{
-			boost::asio::post(multithreads, boost::bind(ProxyProject, i, folder));
+			ProxyProject(i, folder);
 		}
 		else if (AnimDataEdited[i]->proxy)		// deleted project
 		{
@@ -118,13 +114,12 @@ void animDataProcess()
 		}
 		else
 		{
-			boost::asio::post(multithreads, boost::bind(ProjectProcessing, i, folder));
+			ProjectProcessing(i, folder);
 		}
 
 		if (Error) break;
 	}
 
-	multithreads.join();
 }
 
 void ProxyProject(int counter, string folder)
@@ -139,7 +134,7 @@ void ProxyProject(int counter, string folder)
 		return;
 	}
 
-	ofstream outputfile(folder + projectname + "\\" + "$header$.txt");
+	auto outputfile = OpenPatchFile(folder + projectname + "\\" + "$header$.txt");
 
 	if (outputfile.is_open())
 	{
@@ -164,8 +159,6 @@ void ProxyProject(int counter, string folder)
 		return;
 	}
 
-	outputfile.close();
-
 	if (animData->unknown2 != "0")
 	{
 		unordered_map<string, string> namecode;
@@ -174,7 +167,7 @@ void ProxyProject(int counter, string folder)
 		{
 			string name = data.name;
 			namecode[data.uniquecode] = name;
-			ofstream output(folder + projectname + "\\" + name + ".txt");
+			auto output = OpenPatchFile(folder + projectname + "\\" + name + ".txt");
 
 			if (output.is_open())
 			{
@@ -210,7 +203,7 @@ void ProxyProject(int counter, string folder)
 				cout << "WARNING: Non-registered unique code detected. Current data will not be utilized (Project: " << animData->name << ", Unique Code: " << infodata.uniquecode << ")" << endl;
 			}
 
-			ofstream output(folder + projectname + "\\" + infodata.uniquecode + ".txt");
+			auto output = OpenPatchFile(folder + projectname + "\\" + infodata.uniquecode + ".txt");
 
 			if (!output.is_open())
 			{
@@ -308,7 +301,7 @@ void ProjectProcessing(int i, string folder)
 
 	if (IsEdited)
 	{
-		ofstream outputfile(folder + projectname + "\\" + "$header$.txt");
+		auto outputfile = OpenPatchFile(folder + projectname + "\\" + "$header$.txt");
 
 		if (outputfile.is_open())
 		{
@@ -347,7 +340,7 @@ void ProjectProcessing(int i, string folder)
 				string name = animdata.name;
 				string uniquecode = modcode + "$" + to_string(modUCCount++);
 				modUC[animdata.uniquecode] = uniquecode;
-				ofstream outputfile(folder + projectname + "\\" + name + "~" + uniquecode + ".txt");
+				auto outputfile = OpenPatchFile(folder + projectname + "\\" + name + "~" + uniquecode + ".txt");
 
 				if (outputfile.is_open())
 				{
@@ -390,7 +383,7 @@ void ProjectProcessing(int i, string folder)
 					uniquecode = modUC[infodata.uniquecode];
 				}
 
-				ofstream outputfile(folder + projectname + "\\" + uniquecode + ".txt");
+				auto outputfile = OpenPatchFile(folder + projectname + "\\" + uniquecode + ".txt");
 
 				if (outputfile.is_open())
 				{
@@ -604,7 +597,7 @@ void ProjectProcessing(int i, string folder)
 
 			if (IsEdited)
 			{
-				ofstream outputfile(folder + projectname + "\\" + name + "~" + uniquecode + ".txt");
+				auto outputfile = OpenPatchFile(folder + projectname + "\\" + name + "~" + uniquecode + ".txt");
 
 				if (outputfile.is_open())
 				{
@@ -775,7 +768,7 @@ void ProjectProcessing(int i, string folder)
 
 			if (IsEdited)
 			{
-				ofstream outputfile(folder + projectname + "\\" + uniquecode + ".txt");
+				auto outputfile = OpenPatchFile(folder + projectname + "\\" + uniquecode + ".txt");
 
 				if (outputfile.is_open())
 				{
@@ -801,15 +794,10 @@ void ProjectProcessing(int i, string folder)
 		}
 	}
 
-	vecstr filelist;
-	read_directory(folder + projectname, filelist);
-
-	if (filelist.size() == 0)
+	const auto directory = PatchPath(folder + projectname);
+	if (boost::filesystem::is_empty(directory) && !boost::filesystem::remove(directory))
 	{
-		if (!boost::filesystem::remove(folder + projectname))
-		{
-			cout << "WARNING: Failed to remove folder" << endl;
-		}
+		cout << "WARNING: Failed to remove folder" << endl;
 	}
 }
 

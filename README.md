@@ -1,6 +1,6 @@
 # HKX Extractor
 
-HKX Extractor is a Windows command-line tool that compares an original Behavior, AnimData, or AnimSetData file with an edited copy and writes Nemesis patch text.
+HKX Extractor is a Windows DLL that compares an original Behavior, AnimData, or AnimSetData file with an edited copy and writes Nemesis patch text.
 
 ## Build
 
@@ -12,16 +12,26 @@ Run this from the repository root in a Visual Studio Developer PowerShell.
 MSBuild.exe .\T2\T2.sln /m /p:Configuration=Release /p:Platform=x64
 ```
 
-The executable is generated at `T2/x64/Release/HKX Extractor.exe`. The Release x64 executable uses the Microsoft Visual C++ runtime.
+The build produces `T2/x64/Release/HKX_Extractor.dll` and `T2/x64/Release/HKX_Extractor.lib`. The DLL and its host must have the same architecture. The Release x64 DLL uses the Microsoft Visual C++ runtime.
 
-## Run
+## Call from C++
 
-Use the original and edited copies of the same file. For Behavior files, match the first-person or third-person variant. Choose a unique `modcode` of 4 to 6 alphanumeric characters.
+Include `HKX_Extractor.h`, link against `HKX_Extractor.lib`, and make the DLL available to your application. Dynamic loaders can resolve the C export `GenerateBehaviorPatchFiles` by name with `GetProcAddress`. [Public header](T2/HKX_Extractor.h)
 
-```powershell
-& ".\T2\x64\Release\HKX Extractor.exe" mymod ".\original.xml" ".\edited.xml"
+```cpp
+#include "HKX_Extractor.h"
+
+bool ok = GenerateBehaviorPatchFiles(
+    "mymod",
+    R"(D:\inputs\original.xml)",
+    R"(D:\inputs\edited.xml)",
+    R"(D:\patches\mymod\staggerbehavior)");
 ```
 
-Patch files are written under `mod/<modcode>/` in the working directory. For binary `.hkx` input, place `hkxcmd.exe` in the working directory before running the extractor. To use interactive mode with the bundled `output.txt` and `output2.txt` samples, run the executable from `T2` without arguments.
+Use 4 to 6 ASCII letters or digits for the mod code. The DLL lowercases it before writing the patch. All three paths are UTF-8. Pass the desired output directory as the fourth argument. Relative paths are resolved against the host's working directory.
+
+Behavior patches are written directly into the requested directory. AnimData and AnimSetData keep their project subdirectories inside it. The DLL creates missing directories and replaces files whose names match generated patches. Other files in the directory are preserved. Calls in the same process can run consecutively or from multiple threads.
+
+The function returns `true` when comparison succeeds, including inputs with no changes, and `false` on failure. Pair inputs of the same type and use the same first-person or third-person variant for Behavior. To process binary `.hkx` input, provide `hkxcmd.exe` beside the DLL or in the host's working directory. Havok XML can be passed directly.
 
 [Implementation review](IMPLEMENTATION_REVIEW.md)

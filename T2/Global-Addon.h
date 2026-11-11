@@ -49,6 +49,11 @@ public:
 		return node.size();
 	}
 
+	void clear()
+	{
+		node.clear();
+	}
+
 	void erase(std::unordered_map<std::string, vecstr>::iterator iter)
 	{
 		nodelock locker(&locker);
@@ -82,18 +87,35 @@ public:
 	}
 };
 
+class PatchMapRegistration
+{
+public:
+	PatchMapRegistration(void* map, void (*clear)(void*));
+	~PatchMapRegistration();
+
+	PatchMapRegistration(const PatchMapRegistration&) = delete;
+	PatchMapRegistration& operator=(const PatchMapRegistration&) = delete;
+
+	static void ClearAll();
+
+private:
+	void* map;
+	void (*clear)(void*);
+};
+
 template<typename subclass>
 class safeStringUMap : public std::unordered_map<std::string, subclass>
 {
 private:
 	std::atomic_flag locker = ATOMIC_FLAG_INIT;
+	PatchMapRegistration registration{this, [](void* map)
+	{
+		static_cast<safeStringUMap*>(map)->clear();
+	}};
 
 public:
 	subclass& operator[] (std::string key)
 	{
-		safeStringMap<string> test;
-		test["hehe"];
-
 		nodelock locker(&locker);
 		return try_emplace(_STD move(key)).first->second;
 	}
@@ -124,8 +146,6 @@ public:
 typedef safeStringMap<std::shared_ptr<hkbobject>> hkRefPtr;
 
 void NemesisReaderFormat(int id, vecstr& output);
-void FolderCreate(std::string curBehaviorPath);
-void GetFunctionLines(std::string filename, vecstr& storeline);
 std::string NodeIDCheck(std::string ID);
 vecstr GetElements(std::string number, std::unordered_map<std::string, vecstr>& functionlines, bool isTransition = false, std::string key = "");
 bool isOnlyNumber(std::string line);

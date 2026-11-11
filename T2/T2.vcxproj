@@ -26,22 +26,24 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -59,15 +61,17 @@
     <BoostLibraryDir Condition="'$(BoostLibraryDir)'=='' and '$(Platform)'=='Win32' and Exists('$(BoostRoot)\lib32-msvc-14.2')">$(BoostRoot)\lib32-msvc-14.2</BoostLibraryDir>
     <BoostLibraryDir Condition="'$(BoostLibraryDir)'==''">$(BoostRoot)\lib</BoostLibraryDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <TargetName>hkxcmpr</TargetName>
+  <PropertyGroup>
+    <TargetName>HKX_Extractor</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory);$(BoostRoot);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HKX_EXTRACTOR_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(BoostLibraryDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>$(MSBuildProjectDirectory)\HKX_Extractor.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -75,7 +79,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -112,9 +116,8 @@
     <ClCompile Include="generatorlines.cpp" />
     <ClCompile Include="Global-Addon.cpp" />
     <ClCompile Include="highestscore.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="HKX_Extractor.cpp" />
     <ClCompile Include="Global.cpp" />
-    <ClCompile Include="readdirectory.cpp" />
     <ClCompile Include="src\atomiclock.cpp" />
     <ClCompile Include="src\FillFunction.cpp" />
     <ClCompile Include="src\hkx\blendcurve.cpp" />
@@ -246,9 +249,9 @@
     <ClInclude Include="generatorlines.h" />
     <ClInclude Include="Global-Addon.h" />
     <ClInclude Include="Global.h" />
+    <ClInclude Include="HKX_Extractor.h" />
     <ClInclude Include="Global-Type.h" />
     <ClInclude Include="highestscore.h" />
-    <ClInclude Include="readdirectory.hpp" />
     <ClInclude Include="src\atomiclock.h" />
     <ClInclude Include="src\FillFunction.h" />
     <ClInclude Include="src\hkx\blendcurve.h" />

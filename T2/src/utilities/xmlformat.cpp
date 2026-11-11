@@ -1,10 +1,9 @@
+#include <boost/filesystem/operations.hpp>
 #include <boost\algorithm\string.hpp>
 #include "xmlformat.h"
 #include "src\hkx\hkbobject.h"
 
 using namespace std;
-
-atomic<int> writtenFile = 0;
 
 namespace nemesis
 {
@@ -699,46 +698,18 @@ bool getNodeRefList(std::string line, vecstr& list)
 
 
 
-void outputExtraction(string filename, string classname, vecstr& output, bool isEdited)
+void outputExtraction(string filename, string, vecstr& output, bool isEdited)
 {
-	if (isEdited)
+	if (!isEdited)
 	{
-		++writtenFile;
-		ofstream outputfile(filename);
-
-		if (outputfile.is_open())
-		{
-			for (auto& line : output)
-			{
-				outputfile << line << "\n";
-			}
-
-			outputfile.close();
-		}
-		else
-		{
-			cout << "ERROR: Edit " + classname + " Output Not Found (File: " << filename << ")" << endl;
-			Error = true;
-			throw 5;
-		}
-
-		if (!IsFileExist(filename))
-		{
-			cout << "ERROR: Edit " + classname + " Output Not Found (File: " << filename << ")" << endl;
-			Error = true;
-			throw 5;
-		}
+		boost::filesystem::remove(PatchPath(filename));
+		return;
 	}
-	else
+
+	auto outputfile = OpenPatchFile(filename);
+	for (const auto& line : output)
 	{
-		if (IsFileExist(filename))
-		{
-			if (remove(filename.c_str()) != 0)
-			{
-				perror("Error deleting file");
-				Error = true;
-				throw 5;
-			}
-		}
+		outputfile << line << '\n';
 	}
+	outputfile.close();
 }

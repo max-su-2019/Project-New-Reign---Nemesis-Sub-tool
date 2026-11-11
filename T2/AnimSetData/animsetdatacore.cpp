@@ -1,10 +1,7 @@
-#include <boost/thread.hpp>
-#include <boost/asio/post.hpp>
-#include <boost/asio/thread_pool.hpp>
-
 #include "animsetdatacore.h"
 #include "animsetdatamatch.h"
-#include "readdirectory.hpp"
+
+#include <boost/filesystem/operations.hpp>
 
 #include "src/utilities/nemesisformat.h"
 
@@ -75,7 +72,7 @@ void animSetDataProcess()
 			return;
 		}
 
-		ofstream outputfile(folder + "\\$header$\\" + "$header$.txt");
+		auto outputfile = OpenPatchFile(folder + "\\$header$\\" + "$header$.txt");
 
 		if (outputfile.is_open())
 		{
@@ -98,13 +95,12 @@ void animSetDataProcess()
 	}
 
 	output.clear();
-	boost::asio::thread_pool multithreads;
 
 	for (unsigned int i = 0; i < AnimSetDataOriginal.size(); ++i)
 	{
 		if (AnimSetDataOriginal[i]->proxy)		// added project
 		{
-			boost::asio::post(multithreads, boost::bind(ProxyProjectSet, i, folder));
+			ProxyProjectSet(i, folder);
 		}
 		else if (AnimSetDataEdited[i]->proxy)		// deleted project
 		{
@@ -116,13 +112,12 @@ void animSetDataProcess()
 		}
 		else
 		{
-			boost::asio::post(multithreads, boost::bind(ProjectSetProcessing, i, folder));
+			ProjectSetProcessing(i, folder);
 		}
 
 		if (Error) break;
 	}
 
-	multithreads.join();
 }
 
 void ProxyProjectSet(int counter, string folder)
@@ -147,7 +142,7 @@ void ProxyProjectSet(int counter, string folder)
 		return;
 	}
 
-	ofstream outputfile(folder + projectname + "\\" + "$header$.txt");
+	auto outputfile = OpenPatchFile(folder + projectname + "\\" + "$header$.txt");
 
 	if (outputfile.is_open())
 	{
@@ -169,12 +164,10 @@ void ProxyProjectSet(int counter, string folder)
 		return;
 	}
 
-	outputfile.close();
-
 	for (auto& data : animSet->datalist)
 	{
 		string name = data.first;
-		ofstream output(folder + projectname + "\\" + name);
+		auto output = OpenPatchFile(folder + projectname + "\\" + name);
 
 		if (!output.is_open())
 		{
@@ -307,7 +300,7 @@ void ProjectSetProcessing(int i, string folder)
 
 	if (IsEdited)
 	{
-		ofstream outputfile(folder + projectname + "\\" + "$header$.txt");
+		auto outputfile = OpenPatchFile(folder + projectname + "\\" + "$header$.txt");
 
 		if (outputfile.is_open())
 		{
@@ -760,7 +753,7 @@ void ProjectSetProcessing(int i, string folder)
 
 		if (IsEdited)
 		{
-			ofstream outputfile(folder + projectname + "\\" + (data.second.proxy ? modcode + "$" : "") + data.first);
+			auto outputfile = OpenPatchFile(folder + projectname + "\\" + (data.second.proxy ? modcode + "$" : "") + data.first);
 
 			if (outputfile.is_open())
 			{
@@ -787,15 +780,10 @@ void ProjectSetProcessing(int i, string folder)
 		output.clear();
 	}
 
-	vecstr filelist;
-	read_directory(folder + projectname, filelist);
-
-	if (filelist.size() == 0)
+	const auto directory = PatchPath(folder + projectname);
+	if (boost::filesystem::is_empty(directory) && !boost::filesystem::remove(directory))
 	{
-		if (!boost::filesystem::remove(folder + projectname))
-		{
-			cout << "WARNING: Failed to remove folder" << endl;
-		}
+		cout << "WARNING: Failed to remove folder" << endl;
 	}
 
 	if (Error) return;

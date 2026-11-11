@@ -1,3 +1,4 @@
+#include <boost/filesystem/operations.hpp>
 #include <boost/thread.hpp>
 
 #include "hkbstatemachine.h"
@@ -841,7 +842,7 @@ void hkbStateMachineExport(string id)
 
 	if (IsEdited)
 	{
-		ofstream outputfile(filename);
+		auto outputfile = OpenPatchFile(filename);
 
 		if (outputfile.is_open())
 		{
@@ -919,13 +920,6 @@ void hkbStateMachineExport(string id)
 	}
 	else
 	{
-		if (IsFileExist(filename))
-		{
-			if (remove(filename.c_str()) != 0)
-			{
-				perror("Error deleting file");
-				Error = true;
-			}
-		}
+		boost::filesystem::remove(PatchPath(filename));
 	}
 }

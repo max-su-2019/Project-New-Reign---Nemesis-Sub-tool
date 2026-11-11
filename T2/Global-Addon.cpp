@@ -3,16 +3,42 @@
 
 #include "src\atomiclock.h"
 
-#include <boost/process/system.hpp>
-
 using namespace std;
 
 extern safeStringMap<string> newID;
 extern vector<usize> datapacktracker;
-extern safeStringMap<string> rootNode;
 atomic_flag locker = ATOMIC_FLAG_INIT;
 
 void dataIDChange(string& line, usize tracker);
+
+namespace
+{
+	vector<PatchMapRegistration*>& PatchMaps()
+	{
+		static vector<PatchMapRegistration*> maps;
+		return maps;
+	}
+}
+
+PatchMapRegistration::PatchMapRegistration(void* map, void (*clear)(void*))
+	: map(map), clear(clear)
+{
+	PatchMaps().push_back(this);
+}
+
+PatchMapRegistration::~PatchMapRegistration()
+{
+	auto& maps = PatchMaps();
+	maps.erase(find(maps.begin(), maps.end(), this));
+}
+
+void PatchMapRegistration::ClearAll()
+{
+	for (const auto registration : PatchMaps())
+	{
+		registration->clear(registration->map);
+	}
+}
 
 void NemesisReaderFormat(int id, vecstr& output)
 {
@@ -189,205 +215,9 @@ vecstr GetElements(string number, unordered_map<string, vecstr>& functionlines, 
 	return elements;
 }
 
-void GetFunctionLines(string filename, vecstr& storeline)
-{
-	{
-		vecstr emptyVS;
-		storeline = emptyVS; 
-	}
-
-	string curfilename;
-	bool hkx = false;
-
-	const auto converter = boost::filesystem::absolute("hkxcmd.exe");
-	if (boost::filesystem::exists(converter))
-	{
-		usize counter = 0;
-		char charline[2000];
-		bool good = false;
-		FILE* file;
-		fopen_s(&file, filename.c_str(), "r");
-
-		if (file)
-		{
-			while (fgets(charline, 2000, file))
-			{
-				if (string(charline).find("<?xml version=\"1.0\" encoding=\"ascii\"?>") != string::npos)
-				{
-					good = true;
-					break;
-				}
-
-				if (counter++ > 20)
-				{
-					break;
-				}
-			}
-
-			fclose(file);
-		}
-		else
-		{
-			cout << "ERROR: Unable to open file (File: " << filename << ")" << endl;
-			Error = true;
-			return;
-		}
-
-		boost::filesystem::path curfile(filename);
-
-		if (good || curfile.extension().string() == ".hkx")
-		{
-			if (curfile.extension().string() != ".hkx")
-			{
-				curfilename = curfile.stem().string() + ".hkx";
-				boost::filesystem::copy_file(curfile, curfilename, boost::filesystem::copy_option::overwrite_if_exists);
-			}
-			else
-			{
-				curfilename = filename;
-			}
-
-			const string convertedFilename = curfilename + ".hkx";
-
-			try
-			{
-				if (boost::process::system(converter, "convert", "-v:XML", curfilename, convertedFilename) != 0
-					|| !boost::filesystem::exists(convertedFilename))
-				{
-					cout << "ERROR: Unable to convert file (File: " << curfilename << ")" << endl;
-					Error = true;
-					return;
-				}
-			}
-			catch (const exception& ex)
-			{
-				cout << "ERROR: Unable to convert file (File: " << curfilename << "): " << ex.what() << endl;
-				Error = true;
-				return;
-			}
-
-			if (curfilename != filename)
-			{
-				while (boost::filesystem::exists(curfilename))
-				{
-					try
-					{
-						boost::filesystem::remove(curfilename);
-					}
-					catch (...) {}
-				}
-			}
-
-			curfilename = convertedFilename;
-			hkx = true;
-		}
-		else
-		{
-			curfilename = filename;
-		}
-	}
-	else
-	{
-		curfilename = filename;
-		usize counter = 0;
-		char charline[2000];
-		FILE* file;
-		fopen_s(&file, filename.c_str(), "r");
-
-		if (file)
-		{
-			while (fgets(charline, 2000, file))
-			{
-				if (string(charline).find("<?xml version=\"1.0\" encoding=\"ascii\"?>") != string::npos)
-				{
-					hkx = true;
-					break;
-				}
-
-				if (counter++ > 20)
-				{
-					break;
-				}
-			}
-
-			fclose(file);
-		}
-		else
-		{
-			cout << "ERROR: Unable to open file (File: " << filename << ")" << endl;
-			Error = true;
-			return;
-		}
-
-	}
-
-	string line;
-	storeline.reserve(FileLineCount(curfilename));
-	char charline[2000];
-	FILE* file;
-	fopen_s(&file, curfilename.c_str(), "r");
-
-	if (file)
-	{
-		if (hkx)
-		{
-			while (fgets(charline, 2000, file))
-			{
-				line = charline;
-
-				if (line.length() > 0 && line.back() == '\n')
-				{
-					line.pop_back();
-				}
-
-				storeline.push_back(line);
-			}
-
-			for (auto& curline : storeline)
-			{
-				if (curline.find("toplevelobject", 0) != string::npos)
-				{
-					rootNode[filename] = boost::regex_replace(curline, boost::regex(".*toplevelobject=\"#([0-9]+)\">.*"), "\\1");
-					break;
-				}
-			}
-		}
-		else
-		{
-			while (fgets(charline, 2000, file))
-			{
-				line = charline;
-
-				if (line.length() > 0 && line.back() == '\n')
-				{
-					line.pop_back();
-				}
-
-				storeline.push_back(line);
-			}
-		}
-
-		fclose(file);
-	}
-	else
-	{
-		cout << "ERROR: Unable to open file (File: " << filename << ")" << endl;
-		Error = true;
-	}
-
-	if (curfilename != filename)
-	{
-		try
-		{
-			boost::filesystem::remove(curfilename);
-		}
-		catch (...) {}
-	}
-}
-
 string NodeIDCheck(string ID)
 {
-	while (atomLock.test_and_set(std::memory_order_acquire));
+	nodelock lock(&atomLock);
 	string modID;
 
 	if (!newID[ID].empty())
@@ -400,13 +230,7 @@ string NodeIDCheck(string ID)
 		newID[ID] = modID;
 	}
 
-	atomLock.clear(std::memory_order_release);
 	return modID;
-}
-
-void FolderCreate(string curBehaviorPath)
-{
-	boost::filesystem::create_directories(curBehaviorPath);
 }
 
 bool isOnlyNumber(string line)

@@ -1,3 +1,4 @@
+#include <boost/filesystem/operations.hpp>
 #include <boost\thread.hpp>
 #include "hkbstatemachinestateinfo.h"
 #include "highestscore.h"
@@ -659,7 +660,7 @@ void hkbStateMachineStateInfoExport(string id)
 
 	if (IsEdited)
 	{
-		ofstream output(filename);
+		auto output = OpenPatchFile(filename);
 
 		if (output.is_open())
 		{
@@ -680,13 +681,6 @@ void hkbStateMachineStateInfoExport(string id)
 	}
 	else
 	{
-		if (IsFileExist(filename))
-		{
-			if (remove(filename.c_str()) != 0)
-			{
-				perror("Error deleting file");
-				Error = true;
-			}
-		}
+		boost::filesystem::remove(PatchPath(filename));
 	}
 }

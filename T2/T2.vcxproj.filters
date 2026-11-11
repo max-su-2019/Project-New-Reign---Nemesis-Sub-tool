@@ -96,7 +96,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="HKX_Extractor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Global.cpp">
@@ -134,9 +134,6 @@
     </ClCompile>
     <ClCompile Include="AnimSetData\animsetdatacore.cpp">
       <Filter>Source Files\animsetdata</Filter>
-    </ClCompile>
-    <ClCompile Include="readdirectory.cpp">
-      <Filter>Source Files\utilities</Filter>
     </ClCompile>
     <ClCompile Include="src\atomiclock.cpp">
       <Filter>Source Files\utilities</Filter>
@@ -494,6 +491,9 @@
     <ClInclude Include="Global.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HKX_Extractor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Global-Addon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -535,9 +535,6 @@
     </ClInclude>
     <ClInclude Include="AnimSetData\animsetdatamatch.h">
       <Filter>Header Files\animsetdata</Filter>
-    </ClInclude>
-    <ClInclude Include="readdirectory.hpp">
-      <Filter>Header Files\utilities</Filter>
     </ClInclude>
     <ClInclude Include="src\atomiclock.h">
       <Filter>Header Files\utilities</Filter>

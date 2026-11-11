@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 
 #include <boost\regex.hpp>
+#include <boost/filesystem/path.hpp>
 
 #include "Global-Addon.h"
 #include "functionwriter.h"
@@ -51,19 +52,20 @@ extern std::string modcode;
 extern std::string targetfilename;
 extern std::string targetfilenameedited;
 extern std::string shortFileName;
-extern std::string shortFileNameEdited;
+extern boost::filesystem::path patchWorkspace;
 extern int functioncount;
 extern std::vector<unsigned int> eventCount;
 extern std::vector<unsigned int> varCount;
 
 int sameWordCount(std::string line, std::string word);
-bool IsFileExist(const std::string& name); // check if file exist
+void ResetPatchState();
+boost::filesystem::path PathFromUtf8(const std::string& path);
+boost::filesystem::path PatchPath(const std::string& relativePath);
+std::ofstream OpenPatchFile(const std::string& relativePath);
 bool IsOldFunction(std::string filename, std::shared_ptr<hkbobject> id, std::string address); // initiate check if it is old or new node
 bool createDirectories(std::string directoryPath);
-std::string ExePath(); // get exe path
 std::string CrossReferencing(std::shared_ptr<hkbobject> hkb_object, std::string address, int functionlayer, bool compare, bool special = false); // whether it is foreign principle or usual cross referencing
 std::string conditionOldFunction(std::shared_ptr<hkbobject> hkb_object, std::string address, int functionlayer, std::string addline, bool isString); // expressCondition specific check whether it is new or old node
-int FileLineCount(std::string filename); // get the total line count in a file
 void RecordID(std::string id, std::string address, bool compare = false); // record id for IsExist node
 
 #endif

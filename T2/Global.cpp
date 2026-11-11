@@ -1,5 +1,8 @@
 #include <boost\atomic.hpp>
 #include <boost\algorithm\string\split.hpp>
+#include <codecvt>
+#include <locale>
+#include <stdexcept>
 
 #include "Global.h"
 
@@ -12,6 +15,8 @@
 #include "src\hkx\generator\blender\hkbposematchinggenerator.h"
 #include "src\hkx\generator\statemachine\hkbstatemachine.h"
 #include "src\hkx\generator\statemachine\hkbstatemachinetransitioninfoarray.h"
+#include "src\hkx\hkbbehaviorgraphdata.h"
+#include "src\stateid.h"
 
 using namespace std;
 
@@ -48,7 +53,7 @@ string modcode = "null";
 string targetfilename;
 string targetfilenameedited;
 string shortFileName;
-string shortFileNameEdited;
+boost::filesystem::path patchWorkspace;
 int functioncount = 0;
 vector<unsigned int> eventCount;
 vector<unsigned int> varCount;
@@ -84,10 +89,91 @@ int sameWordCount(string line, string word)
 	return wordCount;
 }
 
-bool IsFileExist(const string& name)
+void ResetPatchState()
 {
-	struct stat buffer;
-	return (stat(name.c_str(), &buffer) == 0);
+	PatchMapRegistration::ClearAll();
+	originalBehavior.clear();
+	editedBehavior.clear();
+	FunctionLineNew.clear();
+	FunctionLineTemp.clear();
+	FunctionLineOriginal.clear();
+	FunctionLineEdited.clear();
+	idcount.clear();
+	addressID.clear();
+	elements.clear();
+	IsForeign.clear();
+	IsFileInUse.clear();
+	IsBranchOrigin.clear();
+	PerfectMatchCondition.clear();
+	parent.clear();
+	exchangeID.clear();
+	addressChange.clear();
+	eventID.clear();
+	variableID.clear();
+	attributeID.clear();
+	characterID.clear();
+	referencingIDs.clear();
+	hkb_parent.clear();
+	AnimDataOriginal.clear();
+	AnimDataEdited.clear();
+	AnimSetDataOriginal.clear();
+	AnimSetDataEdited.clear();
+	eventCount.clear();
+	varCount.clear();
+	StateMachineID.clear();
+	isSMIDExist.clear();
+	StateID.clear();
+	isStateIDExist.clear();
+	datapacktracker.clear();
+	newID.clear();
+	region.clear();
+	regioncount.clear();
+	patchWorkspace.clear();
+	modcode.clear();
+	targetfilename.clear();
+	targetfilenameedited.clear();
+	shortFileName.clear();
+	functioncount = 0;
+	stateChange = false;
+	Error = false;
+}
+
+boost::filesystem::path PathFromUtf8(const string& path)
+{
+	wstring_convert<codecvt_utf8_utf16<wchar_t>> conversion;
+	const auto wide = conversion.from_bytes(path);
+	if (conversion.converted() != path.size())
+	{
+		throw invalid_argument("Invalid UTF-8 path");
+	}
+	return boost::filesystem::path(wide);
+}
+
+boost::filesystem::path PatchPath(const string& relativePath)
+{
+	const auto path = PathFromUtf8(relativePath);
+	if (path.empty() || path.has_root_path())
+	{
+		throw invalid_argument("Expected a relative patch path");
+	}
+	for (const auto& part : path)
+	{
+		const auto& name = part.native();
+		if (name.empty() || name.back() == L'.' || name.back() == L' '
+			|| name.find_first_of(L"<>:\"|?*") != wstring::npos)
+		{
+			throw invalid_argument("Invalid patch path component");
+		}
+	}
+	return patchWorkspace / path;
+}
+
+ofstream OpenPatchFile(const string& relativePath)
+{
+	ofstream output;
+	output.exceptions(ios::badbit | ios::failbit);
+	output.open(PatchPath(relativePath).c_str());
+	return output;
 }
 
 bool IsOldFunction(string filename, shared_ptr<hkbobject> id, string address)
@@ -292,14 +378,8 @@ bool IsOldFunctionExt(string filename, shared_ptr<hkbobject> hkb_obj, string add
 
 bool createDirectories(string directoryPath)
 {
-	return boost::filesystem::exists(directoryPath) || boost::filesystem::create_directories(directoryPath);
-}
-
-string ExePath()
-{
-	string path = boost::filesystem::current_path().string();
-	string::size_type pos = path.find_last_of("\\/");
-	return path.substr(0, pos);
+	const auto path = PatchPath(directoryPath);
+	return boost::filesystem::is_directory(path) || boost::filesystem::create_directories(path);
 }
 
 string CrossReferencing(shared_ptr<hkbobject> hkb_obj, string address, int functionlayer, bool compare, bool special)
@@ -579,31 +659,6 @@ void conditionCheckAndReplace(string oriID, shared_ptr<hkbobject> hkb_obj)
 		hkbconditionList_E[ref->ID] = ref;
 		editedBehavior[ref->ID] = ref;
 	}
-}
-
-int FileLineCount(string filename)
-{
-	int linecount = 0;
-	char line[1000];
-	FILE* file;
-	fopen_s(&file, filename.c_str(), "r");
-
-	if (file)
-	{
-		while (fgets(line, 1000, file))
-		{
-			linecount++;
-		}
-
-		fclose(file);
-	}
-	else
-	{
-		cout << "ERROR: Unable to open file (File: " << filename << ")" << endl;
-		Error = true;
-	}
-
-	return linecount;
 }
 
 void RecordID(string id, string address, bool compare)
