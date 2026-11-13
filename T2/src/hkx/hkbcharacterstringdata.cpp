@@ -781,18 +781,31 @@ void hkbcharacterstringdata::stringEnter(vecstr& output, vecstr& namelist, vecst
 {
 	bool open = false;
 	vecstr storeline;
-	usize size = namelist.size();
-
-	if (size == 0)
+	const usize originalSize = namelist.size();
+	const usize editedSize = ctrpart_namelist.size();
+	const auto listHeader = [&](usize count)
 	{
-		output.push_back(openParam(base, listname, size) + closeParam());		// 2
-		--base;
-	}
-	else output.push_back(openParam(base, listname, size));		// 2
+		usize indent = base;
+		auto header = openParam(indent, listname, count);
+		if (count == 0) header += closeParam();
+		return header;
+	};
 
-	usize size2 = size;
+	if (originalSize == editedSize)
+	{
+		output.push_back(listHeader(originalSize));
+	}
+	else
+	{
+		nemesis::try_open(open, isEdited, output);
+		output.push_back(listHeader(editedSize));
+		storeline.push_back(listHeader(originalSize));
+		nemesis::try_close(open, output, storeline);
+	}
+
+	++base;
 	matchScoring(namelist, ctrpart_namelist, ID);
-	size = namelist.size();
+	const usize size = namelist.size();
 
 	for (usize i = 0; i < size; ++i)
 	{
@@ -834,21 +847,20 @@ void hkbcharacterstringdata::stringEnter(vecstr& output, vecstr& namelist, vecst
 
 	nemesis::try_close(open, output, storeline);
 
-	if (size > 0)
+	if (originalSize > 0 && editedSize > 0)
 	{
-		if (size2 == 0)
-		{
-			nemesis::try_open(open, isEdited, output);
-			output.push_back(closeParam(base));		// 2
-			nemesis::try_close(open, output, storeline);
-		}
-		else
-		{
-			nemesis::try_close(open, output, storeline);
-			output.push_back(closeParam(base));		// 2
-		}
+		output.push_back(closeParam(base));
 	}
-	else nemesis::try_close(open, output, storeline);
+	else if (originalSize > 0 || editedSize > 0)
+	{
+		nemesis::try_open(open, isEdited, output);
+		(originalSize > 0 ? storeline : output).push_back(closeParam(base));
+		nemesis::try_close(open, output, storeline);
+	}
+	else
+	{
+		--base;
+	}
 }
 
 void hkbcharacterstringdata::stringEnterNew(vecstr& output, vecstr namelist, string listname, usize& base)

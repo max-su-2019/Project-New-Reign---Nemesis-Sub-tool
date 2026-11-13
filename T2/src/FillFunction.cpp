@@ -21,6 +21,7 @@ void AddBehavior(string filename, vecstr& storeline, bool edited)
 	shared_ptr<hkbobject> node;
 	hkRefPtr* curBehavior = edited ? &editedBehavior : &originalBehavior;
 	unordered_map<string, vecstr> nodeStore;
+	vector<pair<shared_ptr<hkbobject>, vecstr>> stringDataNodes;
 	bool virgin = true;
 	bool record = false;
 	bool eventOpen = false;
@@ -29,6 +30,22 @@ void AddBehavior(string filename, vecstr& storeline, bool edited)
 	bool charOpen = false;
 	int counter = 0;
 	buffer.reserve(10000);
+
+	const auto registerNode = [&]()
+	{
+		(*curBehavior)[tempID] = node;
+		node->regis(tempID, edited);
+
+		const auto classCode = node->getClassCode();
+		if (classCode == "b" || classCode == "cc")
+		{
+			stringDataNodes.emplace_back(node, buffer);
+		}
+		else
+		{
+			nodeStore[tempID] = buffer;
+		}
+	};
 
 	for (auto& line: storeline)
 	{
@@ -74,13 +91,7 @@ void AddBehavior(string filename, vecstr& storeline, bool edited)
 						{
 							if (!virgin)
 							{
-								(*curBehavior)[tempID] = node;
-								node->regis(tempID, edited);
-								
-								if (node->getClassCode() == "b") node->dataBake(filename, buffer, edited);
-								else nodeStore[tempID] = buffer;
-
-								// multi_t.create_thread(boost::bind(&dataFill, node, filename, buffer, edited));
+								registerNode();
 							}
 
 							buffer.clear();
@@ -110,15 +121,20 @@ void AddBehavior(string filename, vecstr& storeline, bool edited)
 
 	if (!virgin)
 	{
-		(*curBehavior)[tempID] = node;
-		node->regis(tempID, edited);
-		nodeStore[tempID] = buffer;
-		// node->dataBake(filename, buffer, edited);
+		registerNode();
+	}
+
+	// Character and behavior nodes use the property tables populated by these objects.
+	for (auto& node : stringDataNodes)
+	{
+		node.first->dataBake(filename, node.second, edited);
+		if (Error) return;
 	}
 
 	for (auto& node : nodeStore)
 	{
 		(*curBehavior)[node.first]->dataBake(filename, node.second, edited);
+		if (Error) return;
 	}
 
 	// multi_t.join_all();

@@ -46,20 +46,25 @@ void hkbcharacterdata::dataBake(string filepath, vecstr& nodelines, bool isEdite
 	usize type = 0;
 	usize counter = 0;
 
-	for (auto& line : nodelines)
+	characterPropertyInfos = make_shared<variableinfopack>();
+	for (const auto& line : nodelines)
 	{
-		usize pos = line.find("<hkparam name=\"stringData\">");
-
-		if (pos != string::npos)
+		string stringID;
+		if (readParam("stringData", line, stringID))
 		{
-			pos += 27;
-			string stringID = line.substr(pos, line.find("</hkparam>", pos) - pos);
-
 			if (stringID != "null")
 			{
-				stringData = (isEdited ? hkbcharacterstringdataList_E : hkbcharacterstringdataList)[stringID];
+				auto& stringNodes = isEdited ? hkbcharacterstringdataList_E : hkbcharacterstringdataList;
+				const auto node = stringNodes.find(stringID);
+				if (node == stringNodes.end() || !node->second || !node->second->characterPropertyNames)
+				{
+					PatchError{} << "Missing character property names for " << ID << " (stringData: " << stringID << ")" << endl;
+					return;
+				}
+				stringData = node->second;
 				characterPropertyInfos = stringData->characterPropertyNames;
 			}
+			break;
 		}
 	}
 
@@ -121,6 +126,11 @@ void hkbcharacterdata::dataBake(string filepath, vecstr& nodelines, bool isEdite
 
 				if (readParam("role", line, output))
 				{
+					if (counter >= characterPropertyInfos->size())
+					{
+						PatchError{} << "Missing character property name for " << ID << " at index " << counter << endl;
+						return;
+					}
 					(*characterPropertyInfos)[counter].role.installRole(output);
 					++type;
 					break;
