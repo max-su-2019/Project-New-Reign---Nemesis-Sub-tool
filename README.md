@@ -1,6 +1,6 @@
 # HKX Extractor
 
-HKX Extractor is a Windows DLL that compares an original Behavior, AnimData, or AnimSetData file with an edited copy and writes Nemesis patch text.
+HKX Extractor is a Windows DLL that compares an original file with an edited copy and writes Nemesis patch text. It supports Havok Behavior and Character files, AnimData, and AnimSetData.
 
 ## Build
 
@@ -30,9 +30,15 @@ bool ok = GenerateBehaviorPatchFiles(
 
 Use 4 to 6 ASCII letters or digits for the mod code. The DLL lowercases it before writing the patch. All three paths are UTF-8. Pass the desired output directory as the fourth argument. Relative paths are resolved against the host's working directory.
 
-Behavior patches are written directly into the requested directory. AnimData and AnimSetData keep their project subdirectories inside it. The DLL creates missing directories and replaces files whose names match generated patches. Other files in the directory are preserved. Calls in the same process can run consecutively or from multiple threads.
+Behavior and Character patches are written directly into the requested directory. AnimData and AnimSetData keep their project subdirectories inside it. The DLL creates missing directories and replaces files whose names match generated patches. Other files in the directory are preserved. Calls in the same process can run consecutively or from multiple threads.
 
 The function returns `true` when comparison succeeds, including inputs with no changes, and `false` on failure. Pair inputs of the same type and use the same first-person or third-person variant for Behavior. The DLL runs `hkxcmd.exe` on each `.hkx` input before comparing it, including files that already contain Havok XML. Place the converter beside the DLL or in the host's working directory. Use the `.xml` extension for Havok XML you want the DLL to read directly.
+
+## Character animation patches
+
+To add animation entries, edit the `animationNames` list in `hkbCharacterStringData` and set its `numelements` to the total number of entries. Pass the original and edited Character files to `GenerateBehaviorPatchFiles`. An animation-list edit produces a text patch named after the node ID, such as `#0029.txt`.
+
+An empty `hkbVariableValueSet.wordVariableValues` list is valid. When word values change, the patch records the count and values for each version. If the declared word count and the values read from the file disagree, the DLL reports a generation error.
 
 ## Read an error
 

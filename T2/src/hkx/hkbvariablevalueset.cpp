@@ -30,6 +30,8 @@ void hkbvariablevalueset::dataBake(string filepath, vecstr& nodelines, bool isEd
 {
 	usize type = 0;
 	usize counter = 0;
+	usize wordCount = 0;
+	wordVariableValues = make_shared<variableinfopack>();
 
 	for (auto& line : nodelines)
 	{
@@ -37,17 +39,14 @@ void hkbvariablevalueset::dataBake(string filepath, vecstr& nodelines, bool isEd
 		{
 			case 0:
 			{
-				usize numelement;
-
-				if (readEleParam("wordVariableValues", line, numelement))
+				if (readEleParam("wordVariableValues", line, wordCount))
 				{
-					if (numelement != 0)
+					if (wordCount != 0)
 					{
-						usize numID = stoi(ID.substr(1)) - 1;
-						safeStringUMap<shared_ptr<variableinfopack>>& infoPackPtr = isEdited ? variablePackNode_E : variablePackNode;
-						safeStringUMap<shared_ptr<hkbvariablevalueset>>& variablevaluesetPtr = isEdited ? hkbvariablevaluesetList_E : hkbvariablevaluesetList;
+						auto& infoPackPtr = isEdited ? variablePackNode_E : variablePackNode;
+						auto& variablevaluesetPtr = isEdited ? hkbvariablevaluesetList_E : hkbvariablevaluesetList;
 
-						do
+						for (int numID = stoi(ID.substr(1)) - 1; numID >= 0; --numID)
 						{
 							string strID = to_string(numID);
 
@@ -60,16 +59,15 @@ void hkbvariablevalueset::dataBake(string filepath, vecstr& nodelines, bool isEd
 
 							if (itr != infoPackPtr.end())
 							{
-								wordVariableValues = itr->second;
+								if (itr->second && itr->second->size() == wordCount)
+								{
+									wordVariableValues = itr->second;
+								}
 								break;
 							}
-							else
-							{
-								auto it = variablevaluesetPtr.find("#" + strID);
 
-								if (it != variablevaluesetPtr.end()) break;
-							}
-						} while (--numID > 0);
+							if (variablevaluesetPtr.find("#" + strID) != variablevaluesetPtr.end()) break;
+						}
 					}
 
 					++type;
@@ -79,8 +77,20 @@ void hkbvariablevalueset::dataBake(string filepath, vecstr& nodelines, bool isEd
 			}
 			case 1:
 			{
-				if (wordVariableValues && counter < wordVariableValues->size() && readParam("value", line, (*wordVariableValues)[counter].value))
+				int value;
+				if (readParam("value", line, value))
 				{
+					if (counter >= wordCount)
+					{
+						PatchError{} << "Too many word variable values for " << ID << endl;
+						return;
+					}
+					if (counter == wordVariableValues->size())
+					{
+						// Value sets without a matching name table still carry positional values.
+						wordVariableValues->push_back(v_datainfo(""));
+					}
+					(*wordVariableValues)[counter].value = value;
 					++counter;
 					break;
 				}
@@ -89,6 +99,11 @@ void hkbvariablevalueset::dataBake(string filepath, vecstr& nodelines, bool isEd
 
 				if (readEleParam("quadVariableValues", line, numelement))
 				{
+					if (counter != wordCount)
+					{
+						PatchError{} << "Missing word variable values for " << ID << endl;
+						return;
+					}
 					if (numelement != 0) quadVariableValues.reserve(numelement);
 
 					++type;
@@ -266,85 +281,83 @@ void hkbvariablevalueset::match(shared_ptr<hkbobject> counterpart)
 	vecstr storeline;
 	storeline.reserve(10);
 	usize base = 2;
-	usize size = wordVariableValues->d_size();
 	vecstr output;
 	output.reserve(5000);
 
 	output.push_back(openObject(base, ID, variablevalueset::classname, variablevalueset::signature));	// 1
 
-	if (size == 0)
+	const auto& originalWords = *wordVariableValues;
+	const auto& editedWords = *ctrpart->wordVariableValues;
+	const auto hasValue = [](const v_datainfo& word) { return !word.proxy; };
+	const usize originalCount = count_if(originalWords.begin(), originalWords.end(), hasValue);
+	const usize editedCount = count_if(editedWords.begin(), editedWords.end(), hasValue);
+	const auto wordHeader = [&](usize count)
 	{
-		output.push_back(openParam(base, "wordVariableValues", size) + closeParam());		// 2
+		usize indent = base;
+		auto header = openParam(indent, "wordVariableValues", count);
+		if (count == 0) header += closeParam();
+		return header;
+	};
+
+	if (originalCount == editedCount)
+	{
+		output.push_back(wordHeader(originalCount));
+	}
+	else
+	{
+		nemesis::try_open(open, isEdited, output);
+		output.push_back(wordHeader(editedCount));
+		storeline.push_back(wordHeader(originalCount));
+		nemesis::try_close(open, output, storeline);
+	}
+
+	++base;
+	const usize wordSlots = max(originalWords.size(), editedWords.size());
+	for (usize i = 0; i < wordSlots; ++i)
+	{
+		const bool hasOriginal = i < originalWords.size() && hasValue(originalWords[i]);
+		const bool hasEdited = i < editedWords.size() && hasValue(editedWords[i]);
+		if (hasOriginal && hasEdited)
+		{
+			nemesis::try_close(open, output, storeline);
+			output.push_back(openObject(base));
+			paramMatch("value", originalWords[i].value, editedWords[i].value, output, storeline, base, true, open, isEdited);
+			output.push_back(closeObject(base));
+		}
+		else if (hasEdited)
+		{
+			nemesis::try_open(open, isEdited, output);
+			output.push_back(openObject(base));
+			output.push_back(autoParam(base, "value", editedWords[i].value));
+			output.push_back(closeObject(base));
+		}
+		else if (hasOriginal)
+		{
+			nemesis::try_open(open, isEdited, output);
+			storeline.push_back(openObject(base));
+			storeline.push_back(autoParam(base, "value", originalWords[i].value));
+			storeline.push_back(closeObject(base));
+			output.insert(output.end(), 3, "");
+		}
+	}
+
+	nemesis::try_close(open, output, storeline);
+	if (originalCount > 0 && editedCount > 0)
+	{
+		output.push_back(closeParam(base));
+	}
+	else if (originalCount > 0 || editedCount > 0)
+	{
+		nemesis::try_open(open, isEdited, output);
+		(originalCount > 0 ? storeline : output).push_back(closeParam(base));
+		nemesis::try_close(open, output, storeline);
+	}
+	else
+	{
 		--base;
 	}
-	else output.push_back(openParam(base, "wordVariableValues", size));		// 2
 
-	size = wordVariableValues->size();
-
-	for (usize i = 0; i < size; ++i)
-	{
-		// newly created data
-		if ((*wordVariableValues)[i].proxy)
-		{
-			nemesis::try_open(open, isEdited, output);
-
-			while (i < size)
-			{
-				output.push_back(openObject(base));		// 3
-				output.push_back(autoParam(base, "value", (*ctrpart->wordVariableValues)[i].value));
-				output.push_back(closeObject(base));	// 3
-				++i;
-			}
-		}
-		// deleted existing data
-		else if ((*ctrpart->wordVariableValues)[i].proxy)
-		{
-			nemesis::try_open(open, isEdited, output);
-
-			while (i < size)
-			{
-				if (!(*ctrpart->wordVariableValues)[i].proxy)
-				{
-					--i;
-					break;
-				}
-
-				storeline.push_back(openObject(base));		// 3
-				storeline.push_back(autoParam(base, "value", (*wordVariableValues)[i].value));
-				storeline.push_back(closeObject(base));	// 3
-				++i;
-				output.push_back("");
-				output.push_back("");
-				output.push_back("");	// 3 spaces
-			}
-		}
-		// both exist
-		else
-		{
-			nemesis::try_close(open, output, storeline);
-			output.push_back(openObject(base));		// 3
-			paramMatch("value", (*wordVariableValues)[i].value, (*ctrpart->wordVariableValues)[i].value, output, storeline, base, true, open, isEdited);
-			output.push_back(closeObject(base));	// 3
-		}
-	}
-
-	if (size > 0)
-	{
-		if (wordVariableValues->d_size() == 0)
-		{
-			nemesis::try_open(open, isEdited, output);
-			output.push_back(closeParam(base));		// 2
-			nemesis::try_close(open, output, storeline);
-		}
-		else
-		{
-			nemesis::try_close(open, output, storeline);
-			output.push_back(closeParam(base));		// 2
-		}
-	}
-	else nemesis::try_close(open, output, storeline);
-
-	size = quadVariableValues.size();
+	usize size = quadVariableValues.size();
 	usize size2 = ctrpart->quadVariableValues.size();
 
 	if (size == 0)
